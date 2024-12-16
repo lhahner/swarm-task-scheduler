@@ -1,3 +1,0 @@
-/Users/lennart.hahner/Documents/swarm-task-scheduler/src/build/CMakeFiles/pso.dir
-/Users/lennart.hahner/Documents/swarm-task-scheduler/src/build/CMakeFiles/edit_cache.dir
-/Users/lennart.hahner/Documents/swarm-task-scheduler/src/build/CMakeFiles/rebuild_cache.dir
