@@ -13,7 +13,8 @@ import org.cloudsimplus.utilizationmodels.UtilizationModelDynamic;
 import org.cloudsimplus.vms.VmSimple;
 
 public class SchedeulerApplication {
-
+	
+	Particle particle;
 	
 	
 	public static void main(String[] args) {
