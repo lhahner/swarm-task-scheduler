@@ -1,45 +1,58 @@
 package pgm.swarm.schedeuler;
 
-/**
+/** 
  * Particle which is part of the Particle-Swarm-Optimization 
  * algorithm.
  * 
  * @version 1.0.0
  * @author Lennart Hahner
  */
-public class Particle {
+public class Particle implements Agent{
 	
 	/**
 	 * Stores the current position of the particle.
 	 */
-	long pos;
+	private double pos;
 	
 	/**
 	 * stores the current velocity of the particle. 
 	 */
-	long velo;
-	
-	/**
-	 * Constructs a Particle with a position an velocity
-	 * at the beginning of its lifetime.
-	 * 
-	 * @param pos
-	 * @param velo
-	 */
-	public Particle(long pos, long velo) {
-		if(pos > 0 && velo > 0) {
-			this.pos = pos;
-			this.velo = velo;
-		}
-	}
+	private double velo;
 	
 	/**
 	 * Gets the current position of the particle.
 	 * 
 	 * @return the current position of the particle.
 	 */
-	public long getPos() {
+	public double getPos() {
 		return pos;
+	}
+	
+	/**
+	 * Get the current velocity of the particle.
+	 * 
+	 * @return the current velocity of a particle.
+	 */
+	public double getVelo() {
+		return velo;
+	}
+	
+	/**
+	 * Sets the current position of the particle.
+	 * 
+	 * @param the new position
+	 */
+	public void setPos(double pos) {
+		this.pos = pos;
+	}
+	
+	/**
+	 * Set the current velocity of the particle.
+	 * 
+	 * @param the new velocity
+	 */
+	public void setVelo(double velo) {
+		this.velo = velo;
 	}
 	
 	/**
@@ -48,17 +61,8 @@ public class Particle {
 	 * @param cur_pos The initial position of the particle.
 	 * @param new_velo The new velocity upon it will change its position.
 	 */
-	public void setPosition(long cur_pos, long new_velo) {
+	public void calcPos(double cur_pos, double new_velo) {
 		this.pos = cur_pos + new_velo;
-	}
-	
-	/**
-	 * Get the current velocity of the particle.
-	 * 
-	 * @return the current velocity of a particle.
-	 */
-	public long getVelo() {
-		return velo;
 	}
 	
 	/**
@@ -71,9 +75,19 @@ public class Particle {
 	 * @param c_2 constant for weighting the values.
 	 * @param global_best possible global best position. 
 	 */
-	public void setVelo(long cur_velo, long c_1, long pos_best, long pos, long c_2, long global_best) {
+	public void calcVelo(double cur_velo, double c_1, double pos_best, double pos, double c_2, double global_best) {
 		long r_1 = (long)Math.random();
 		long r_2 = (long)Math.random();
 		this.velo = cur_velo + c_1 * r_1 * (pos_best - pos) + c_2 * r_2 * (global_best - pos);
-	}	
+	}
+	
+	/**
+	 * Converts the Object values to a String.
+	 * 
+	 * @return The Object as a String with its values.
+	 */
+	@Override
+	public String toString() {
+		return "Particle{position=" + this.pos + ", velocity=" + this.velo + "}";
+	}
 }
