@@ -15,7 +15,7 @@ evaluation criteria, and proposed technologies to use.
 
 The research and implementation process will be thoroughly documented 
 in a written report and presented through a formal presentation.
-
+  
 ## Methods & Technologies
 
 The approach involves applying the Particle Swarm Optimization (PSO) 

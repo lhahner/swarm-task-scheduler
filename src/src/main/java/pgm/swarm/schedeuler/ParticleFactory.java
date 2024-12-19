@@ -14,10 +14,10 @@ public class ParticleFactory {
 	 * @param velo initial velocity of the Agent/Particle.
 	 * @return a new Particle.
 	 */
-	public Agent getParticle(double pos, double velo) {
-		if(pos >= 0 && velo >= 0) {
+	public Agent getParticle(double x, double y, double velo) {
+		if((x >= 0 && y >= 0) && velo >= 0) {
 			Particle particle = new Particle();
-			particle.setPos(pos);
+			particle.setPos(x, y);
 			particle.setVelo(velo);
 			return particle;
 		}

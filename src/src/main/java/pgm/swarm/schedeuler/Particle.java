@@ -4,6 +4,8 @@ package pgm.swarm.schedeuler;
  * Particle which is part of the Particle-Swarm-Optimization 
  * algorithm.
  * 
+ * TODO Make the velocity as an array.
+ * 
  * @version 1.0.0
  * @author Lennart Hahner
  */
@@ -12,7 +14,7 @@ public class Particle implements Agent{
 	/**
 	 * Stores the current position of the particle.
 	 */
-	private double pos;
+	private double[] pos = new double[2];
 	
 	/**
 	 * stores the current velocity of the particle. 
@@ -20,12 +22,17 @@ public class Particle implements Agent{
 	private double velo;
 	
 	/**
+	 * local best values
+	 */
+	private double[] pbest = new double[2];
+
+	/**
 	 * Gets the current position of the particle.
 	 * 
 	 * @return the current position of the particle.
 	 */
-	public double getPos() {
-		return pos;
+	public double[] getPos() {
+		return this.pos;
 	}
 	
 	/**
@@ -42,8 +49,9 @@ public class Particle implements Agent{
 	 * 
 	 * @param the new position
 	 */
-	public void setPos(double pos) {
-		this.pos = pos;
+	public void setPos(double x, double y) {
+		this.pos[0] = x;
+		this.pos[1] = y;
 	}
 	
 	/**
@@ -61,8 +69,10 @@ public class Particle implements Agent{
 	 * @param cur_pos The initial position of the particle.
 	 * @param new_velo The new velocity upon it will change its position.
 	 */
-	public void calcPos(double cur_pos, double new_velo) {
-		this.pos = cur_pos + new_velo;
+	public void calcPos(double[] cur_pos, double new_velo) {
+		for(int i = 0; i<this.pos.length;i++) {
+			this.pos[i] = cur_pos[i] + new_velo;
+		}
 	}
 	
 	/**
@@ -75,10 +85,13 @@ public class Particle implements Agent{
 	 * @param c_2 constant for weighting the values.
 	 * @param global_best possible global best position. 
 	 */
-	public void calcVelo(double cur_velo, double c_1, double pos_best, double pos, double c_2, double global_best) {
-		long r_1 = (long)Math.random();
-		long r_2 = (long)Math.random();
-		this.velo = cur_velo + c_1 * r_1 * (pos_best - pos) + c_2 * r_2 * (global_best - pos);
+	public void calcVelo(double cur_velo, double c_1, double[] pos_best, double[] pos, double c_2, double[] global_best) {
+		
+		double r_1 = Math.random();
+		double r_2 = Math.random();
+		
+	
+		this.velo = (double)(cur_velo + c_1 * r_1 * (pos_best[0] - pos[0]) + c_2 * r_2 * (global_best[0] - pos[0]));
 	}
 	
 	/**
@@ -88,6 +101,26 @@ public class Particle implements Agent{
 	 */
 	@Override
 	public String toString() {
-		return "Particle{position=" + this.pos + ", velocity=" + this.velo + "}";
+		return "Particle{position=" + this.pos[0] + "," + this.pos[1] + ",velocity=" + this.velo + 
+			    ",pbest=" + this.pbest[0] + "," + this.pbest[1] + "} \n";
+	}
+	
+	/**
+	 * Gets the current value of pbest.
+	 * 
+	 * @return the local best position pbest.
+	 */
+	public double[] getPbest() {
+		return pbest;
+	}
+	
+	/**
+	 * Sets the values for pbest.
+	 * 
+	 * @param x The value on the x-axis.
+	 * @param y The value on the y-axis.
+	 */
+	public void setPbest(double[] pbest) {
+		this.pbest = pbest;
 	}
 }
