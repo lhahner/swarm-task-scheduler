@@ -4,6 +4,12 @@ import java.util.ArrayList;
 
 public class PatricleSwarm {
 	
+	
+	/**
+	 * Global optimum
+	 */
+	private double[] gbest = {10,10};
+	
 	/**
 	 * This Array stores all the particles of the swarm.
 	 */
@@ -37,6 +43,20 @@ public class PatricleSwarm {
 	 */
 	public ArrayList<Particle> getParticles(){
 		return this.particles;
+	}
+	
+	/**
+	 * Sets the global optimum
+	 */
+	public void setGbest(double[] gbest) {
+		System.arraycopy(gbest, 0, this.gbest, 0, this.gbest.length);
+	}
+	
+	/**
+	 * 
+	 */
+	public double[] getGbest() {
+		return this.gbest;
 	}
 	
 	/**

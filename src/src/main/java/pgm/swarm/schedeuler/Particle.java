@@ -24,7 +24,7 @@ public class Particle implements Agent{
 	/**
 	 * local best values
 	 */
-	private double[] pbest = new double[2];
+	private double[] pbest = {10, 10};
 
 	/**
 	 * Gets the current position of the particle.
@@ -121,6 +121,21 @@ public class Particle implements Agent{
 	 * @param y The value on the y-axis.
 	 */
 	public void setPbest(double[] pbest) {
-		this.pbest = pbest;
+		System.arraycopy(pbest, 0, this.pbest, 0, this.pbest.length);;
+	}
+	
+	/**
+	 * Example of a fitness function. The smaller the returned value, the better.
+	 * 
+	 * @param positions the current positions of the particle
+	 * @return the new positions
+	 */
+	public double evaluate(double[] positions) {
+
+		double fitness = 0.0;
+		for (double pos : positions) {
+			fitness += pos * pos;
+		}
+		return fitness;
 	}
 }
