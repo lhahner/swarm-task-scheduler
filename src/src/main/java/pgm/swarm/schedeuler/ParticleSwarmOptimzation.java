@@ -29,7 +29,7 @@ public class ParticleSwarmOptimzation {
 						ps.setGbest(particle.getPos());
 					}
 					
-					particle.calcVelo(particle.getVelo(), 0.25, particle.getPbest(), particle.getPos(), 0.25, ps.getGbest());
+					particle.calcVelo(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, ps.getGbest());
 					particle.calcPos(particle.getPos(), particle.getVelo());
 					
 			}
