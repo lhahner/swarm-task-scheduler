@@ -53,7 +53,7 @@ public class PatricleSwarm {
 	}
 	
 	/**
-	 * 
+	 * gets the global best
 	 */
 	public double[] getGbest() {
 		return this.gbest;

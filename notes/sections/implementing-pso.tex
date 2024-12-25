@@ -1,0 +1,52 @@
+\section{Implementing the particle swarm optimization algorithm in Java}
+\paragraph{Project enviroment}
+The project was setup with the project management tool maven and the spring initalizer.
+This enables a portable solution and solves every dependency quickly.
+Furthermore was the algorithm implemented with the Intergrated Development Enviroment (IDE)
+Eclipse. 
+
+\paragraph{Object-oriented concept}
+Before actually implementing the algorithm itself, 
+the concept was built in an object-oriented manner, in which each particle is based on a 
+class. The class Particle has the properties velocity and position, which are implemented 
+as variables. Since the velocity is calculated using the presented equation \ref{} and the
+ new assigned position \ref{}, both are implemented as methods of the Particle class. 
+ Additionally, each particle has an evaluate method that implements the fitness function 
+ to optimize.
+
+Each particle implements the interface Agent. This is because the factory design pattern 
+is applied for constructing particles in other classes, leading to the implementation of 
+the class ParticleFactory. From this class, an object should be constructed, and the 
+method getParticle should be called to create particles for the application. The reason 
+for this approach is that it ensures that whenever a particle is created, its initial 
+position is greater than zero. % Check here again why this should be the case?
+
+Another class, ParticleSwarm, is created to represent the swarm of particles. Here, an 
+ArrayList is used to store all the particles that belong to this swarm. Additionally, 
+the variable gbest is used to store the global optimum of this swarm.
+
+Together, the classes are constructed as objects inside the ParticleSwarmOptimization 
+class. In this class, the evaluation of the fitness function is performed for every 
+particle in every iteration of the implemented loop.
+To call the optimize method of this class, the user needs to specify the swarm to be 
+optimized, the initial values for the particles, and an initial size for the swarm. The 
+size of the swarm will determine the number of iterations performed.
+
+% % Listing format
+% \begin{figure}[H]
+% 	\begin{lstlisting}[language=Java, caption=<description>, 
+%         captionpos=b, 
+%         label=xl-code,numbers=left ,
+%         firstline=1, firstnumber=1, lastline=30]
+% 	\end{lstlisting}
+% \end{figure}
+
+% % Picture format
+% \begin{figure}[H]
+% 	\begin{center}
+% 		\includegraphics[width=9cm, height=8cm]{<source>}
+% 	\end{center}
+% 	\caption{<description>}
+% 	\label{<label-for-ref>}
+% 	\centering
+% \end{figure}
