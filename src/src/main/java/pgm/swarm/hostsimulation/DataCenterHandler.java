@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cloudsimplus.allocationpolicies.VmAllocationPolicySimple;
+import org.cloudsimplus.brokers.DatacenterBroker;
+import org.cloudsimplus.brokers.DatacenterBrokerSimple;
+import org.cloudsimplus.core.CloudSimPlus;
 import org.cloudsimplus.core.Simulation;
 import org.cloudsimplus.datacenters.Datacenter;
 import org.cloudsimplus.hosts.*;
@@ -14,7 +17,14 @@ import org.cloudsimplus.datacenters.DatacenterCharacteristics;
 import org.cloudsimplus.datacenters.DatacenterCharacteristicsSimple;
 import org.cloudsimplus.datacenters.DatacenterSimple;
 
-public class DataCenter {
+/**
+ * Class used for Datacenter handling while
+ * simulating a cloud-enviroment with Cloudsim.
+ * 
+ * @author lennart.hahner
+ * @version 1.0.0
+ */
+public class DataCenterHandler {
 	
 	List<Host> hostList = new ArrayList<Host>();
 	List<Pe> peList = new ArrayList<Pe>();
@@ -23,21 +33,20 @@ public class DataCenter {
 	int ram = 2048; //host memory (MB)
 	long storage = 1000000; //host storage
 	int bw = 10000;
-	
 	int mips = 1000;
 	
+	/**
+	 * To create a DataCenter two lists are required, one to store
+	 * the hosts and the other to store the CPUs (PE). 
+	 * 
+	 * @param name The current Simulation running.
+	 * @return The Datacenter for the required simulation.
+	 */
 	public Datacenter createDatacenter(Simulation name) {
 		
 		try {
 			peList.add(new PeSimple(mips));
 			hostList.add(new HostSimple(ram, bw, storage, peList));
-			
-			double cost = 3.0; // the cost of using processing in this resource
-			double costPerMem = 0.05; // the cost of using memory in this resource
-			double costPerStorage = 0.001; // the cost of using storage in this resource
-			
-			DatacenterCharacteristics characteristics 
-			= new DatacenterCharacteristicsSimple(cost, costPerMem, costPerStorage);
 			
 			Datacenter datacenter = new DatacenterSimple(name, hostList, new VmAllocationPolicySimple());
 			
@@ -47,5 +56,26 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	/**
+	 * Broker act as an intermediary broker between 
+	 * the cloud users and the cloud service providers.
+	 * 
+	 * @param sim
+	 * @return
+	 */
+	public DatacenterBrokerSimple createBroker(CloudSimPlus sim) {
+		DatacenterBrokerSimple broker = null;
+		
+		try {
+			broker = new DatacenterBrokerSimple(sim);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return broker;
 	}
 }
