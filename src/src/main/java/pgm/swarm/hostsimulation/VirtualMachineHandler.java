@@ -45,7 +45,7 @@ public class VirtualMachineHandler {
 	 */
 	public void addVmToList(int mips, long pes_number) {
 		if(mips > 0 && pes_number > 0) {
-			vmlist.add(new VmSimple(mips, pes_number, new CloudletSchedulerTimeShared()));
+			vmlist.add(new VmSimple(mips, pes_number));
 		}
 		else {
 			return;
@@ -79,6 +79,45 @@ public class VirtualMachineHandler {
 			if(vm.getId() == vm_id) {
 				this.vmlist.remove(vm);
 			}
+		}
+	}
+	
+	/**
+	 * Returns the current available Bandwidth of the VM.
+	 * 
+	 * @param index The VM from the list.
+	 * @return The available Bandwidth.
+	 */
+	public long getAvailableBandwidth(int index) {
+		return vmlist.get(index).getBw().getAllocatedResource();
+	}
+	
+	/**
+	 * Returns the current available Storage of the VM.
+	 * 
+	 * @param index The VM from the list.
+	 * @return The current available storage.
+	 */
+	public long getAvailableStorage(int index) {
+		return vmlist.get(index).getStorage().getAvailableResource();
+	}
+	
+	/**
+	 * Returns the current available ram of the VM.
+	 * 
+	 * @param index The VM from the list.
+	 * @return The current available RAM.
+	 */
+	public long getAvailableRam(int index) {
+		return vmlist.get(index).getRam().getAvailableResource();
+	}
+	
+	/**
+	 * TODO write a function to get the important stats of a VM.
+	 */
+	public void printAllVmStats() {
+		for(Vm vm : this.vmlist) {
+			System.out.println("CPU % Utilization: " + vm.getHost().getCpuUtilizationStats().getMean());
 		}
 	}
 }

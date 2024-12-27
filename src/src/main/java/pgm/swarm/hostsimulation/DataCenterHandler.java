@@ -30,7 +30,7 @@ public class DataCenterHandler {
 	List<Pe> peList = new ArrayList<Pe>();
 	
 	int hostId=0;
-	int ram = 2048; //host memory (MB)
+	int ram = 8048; //host memory (MB)
 	long storage = 1000000; //host storage
 	int bw = 10000;
 	int mips = 1000;
@@ -42,13 +42,20 @@ public class DataCenterHandler {
 	 * @param name The current Simulation running.
 	 * @return The Datacenter for the required simulation.
 	 */
-	public Datacenter createDatacenter(Simulation name) {
+	public Datacenter createDatacenter(Simulation name, int numberOfHosts, int numberOfPesPerHost) {
 		
 		try {
-			peList.add(new PeSimple(mips));
-			hostList.add(new HostSimple(ram, bw, storage, peList));
+			for(int i = 0;i<numberOfHosts;i++) {
+				for(int j = 0; j<numberOfPesPerHost; j++) {
+					peList.add(new PeSimple(mips));
+				}
+				hostList.add(new HostSimple(ram, bw, storage, peList));
+				hostList.get(i).enableUtilizationStats();
+			}
+			DatacenterCharacteristics dcc = new DatacenterCharacteristicsSimple(0.02, 0.10, 0.12);
 			
 			Datacenter datacenter = new DatacenterSimple(name, hostList, new VmAllocationPolicySimple());
+			datacenter.setCharacteristics(dcc);
 			
 			return datacenter;
 			
@@ -77,5 +84,38 @@ public class DataCenterHandler {
 		}
 		
 		return broker;
+	}
+	
+	/**
+	 * Calculation of cost per Seconds
+	 * 
+	 * @param costPerSecond The costs in Dollar or Euros
+	 * @param seconds The seconds which the system runs.
+	 * @return The addend of cost per seconds and the seconds
+	 */
+	public double calculateCostsPerSecond(double costPerSecond, double seconds) {
+		return costPerSecond * seconds;
+	}
+	
+	/**
+	 * Calculation of the cost per Storage
+	 * 
+	 * @param costPerStorage The costs in Dollar or Euros
+	 * @param storage The storage used
+	 * @return The costPerStorage times the storage used
+	 */
+	public double calculateCostsPerStorage(double costPerStorage, double storage) {
+		return costPerStorage * storage;
+	}
+	
+	/**
+	 * Calculation of the cost per memory
+	 * 
+	 * @param costPerMem The costs Dollar or Euro
+	 * @param memory The memory used
+	 * @return The memory times costs per memory
+	 */
+	public double calculateCostsPerMem(double costPerMem, double memory) {
+		return costPerMem * memory;
 	}
 }

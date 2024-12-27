@@ -20,6 +20,24 @@ public class CloudLetHandler {
 	ArrayList<CloudletSimple> cloudletlist = new ArrayList<CloudletSimple>();
 	
 	/**
+	 * Returns the current cloudletlist.
+	 * 
+	 * @return the Cloudletlist of the Object.
+	 */
+	public ArrayList<CloudletSimple> getCloudletlist(){
+		return this.cloudletlist;
+	}
+	
+	/**
+	 * Set a new cloudletlist.
+	 * 
+	 * @param cloudletlist Assigns the objects cloudletlist
+	 */
+	public void setCloudletlist(ArrayList<CloudletSimple> cloudletlist) {
+		this.cloudletlist = cloudletlist;
+	}
+	
+	/**
 	 * Adds cloudlet to current list.
 	 * 
 	 * @param id
@@ -31,13 +49,11 @@ public class CloudLetHandler {
 	}
 	
 	/**
-	 * TODO binds a cloudlet to a vm by a broker.
-	 * 
-	 * @param broker
-	 * @param vm
-	 * @param cloudlet
+	 * This method will generate a certain amount of cloudlet items.
 	 */
-	public void bindCloudletToVm(DatacenterBrokerSimple broker, Vm vm, CloudletSimple cloudlet) {
-		broker.bindCloudletToVm(cloudlet, vm);
+	public void generateCloudlets(int length, int pesnumber, int numberOfCloudletItems) {
+		for(int i = 0; i<numberOfCloudletItems;i++) {
+			this.cloudletlist.add(new CloudletSimple(length, pesnumber));
+		}
 	}
 }
