@@ -120,4 +120,14 @@ public class VirtualMachineHandler {
 			System.out.println("CPU % Utilization: " + vm.getHost().getCpuUtilizationStats().getMean());
 		}
 	}
+	
+	/**
+	 * Equivalent to the cloudlet statistics provider
+	 * 
+	 * @return mips * numbers of PEs used
+	 */
+	public double getVmProvidedResources(int index) {
+		return this.vmlist.get(index).getMips() * this.vmlist.get(index).getPesNumber();
+	}
+	
 }

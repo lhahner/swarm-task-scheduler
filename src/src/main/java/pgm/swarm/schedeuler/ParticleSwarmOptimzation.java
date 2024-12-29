@@ -2,6 +2,10 @@ package pgm.swarm.schedeuler;
 
 import java.util.ArrayList;
 
+import org.cloudsimplus.brokers.DatacenterBrokerSimple;
+import org.cloudsimplus.cloudlets.Cloudlet;
+import org.cloudsimplus.vms.Vm;
+
 public class ParticleSwarmOptimzation {
 	
 	/**
@@ -42,5 +46,72 @@ public class ParticleSwarmOptimzation {
 		}
 		
 		System.out.println("gbest: " + swarm.getGbest()[0] + "," + swarm.getGbest()[1]);
+	}
+	
+	/**
+	 * Optimize schedueling based on the makespan of current taks for
+	 * the current vm. Calculate the makespan for every Vm on every
+	 * task. If the makespan is lower than the best assign it 
+	 * to the Vm.
+	 * 
+	 * @param swarm The swarm used for optimization
+	 * @param tasklist The tasks currently in the simulation
+	 * @param vmlist The VMs currently in the simulation
+	 * @param broker The broker used for binding
+	 */
+	public void optimizeSchedueling(PatricleSwarm swarm, ArrayList<Cloudlet> tasklist, ArrayList<Vm> vmlist, 
+			DatacenterBrokerSimple broker) {
+		
+		swarm.setParticles(0, 0, tasklist.size());
+		ArrayList<Particle> particles = swarm.getParticles();
+		
+		for(int i = 0; i<10;i++) {
+
+			for(Particle particle : particles) {
+				
+				if(this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
+						< this.evaluateSchedueling(particle.getPbest(), tasklist, vmlist)) {
+					double[] pbest = particle.getPos();
+					particle.setPbest(pbest);
+					
+					broker.bindCloudletToVm(tasklist.get((int)particle.getPos()[0]), vmlist.get((int)particle.getPos()[1]));
+				}
+				
+				if(this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
+						< this.evaluateSchedueling(swarm.getGbest(), tasklist, vmlist)) {
+					swarm.setGbest(particle.getPos());
+					
+					broker.bindCloudletToVm(tasklist.get((int)particle.getPos()[0]), vmlist.get((int)particle.getPos()[1]));
+				}
+				
+				particle.calcVelo(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGbest());
+				particle.calcPos(particle.getPos(), particle.getVelo());
+			}
+		}
+		
+	}
+	
+	/**
+	 * Calculation of the some propreties
+	 * in the simulation.
+	 * 
+	 * @param pos Position of the particle
+	 * @param tasks Tasks to be checked
+	 * @param vms Vm to be checked
+	 * @return The calculated proprety
+	 */
+	public double evaluateSchedueling(double[] pos, ArrayList<Cloudlet> tasks, ArrayList<Vm> vms) {
+		
+		Vm vm = vms.get((int) Math.round(pos[0]));
+		Cloudlet task = tasks.get((int) Math.round(pos[1]));
+		double makespan = 0;
+		
+		if(vm.isSuitableForCloudlet(task)) {
+			makespan = task.getLength() / (vm.getMips() * vm.getPesNumber());
+		}
+		else {
+			return 10.0;
+		}
+		return 10;
 	}
 }

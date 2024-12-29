@@ -56,4 +56,14 @@ public class CloudLetHandler {
 			this.cloudletlist.add(new CloudletSimple(length, pesnumber));
 		}
 	}
+	
+	/**
+	 * This method should calculate the required resources for a
+	 * certain task in a distinguished formular.
+	 * 
+	 * @return length * numbers of PEs required
+	 */
+	public double getTasksRequiredResources(int index) {
+		return this.cloudletlist.get(index).getLength() * this.cloudletlist.get(index).getPesNumber();
+	}
 }
