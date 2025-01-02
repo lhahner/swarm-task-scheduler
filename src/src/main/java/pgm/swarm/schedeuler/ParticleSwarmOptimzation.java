@@ -112,6 +112,6 @@ public class ParticleSwarmOptimzation {
 		else {
 			return 10.0;
 		}
-		return 10;
+		return makespan;
 	}
 }
