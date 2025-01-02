@@ -15,7 +15,7 @@ import pgm.swarm.hostsimulation.CloudLetHandler;
 import pgm.swarm.hostsimulation.DataCenterHandler;
 import pgm.swarm.hostsimulation.VirtualMachineHandler;
 import pgm.swarm.schedeuler.ParticleSwarmOptimzation;
-import pgm.swarm.schedeuler.PatricleSwarm;
+import pgm.swarm.schedeuler.ParticleSwarm;
 
 public class SchedeulerApplication {
 

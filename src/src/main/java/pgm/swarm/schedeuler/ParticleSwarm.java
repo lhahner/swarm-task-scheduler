@@ -2,7 +2,7 @@ package pgm.swarm.schedeuler;
 
 import java.util.ArrayList;
 
-public class PatricleSwarm {
+public class ParticleSwarm {
 	
 	
 	/**
