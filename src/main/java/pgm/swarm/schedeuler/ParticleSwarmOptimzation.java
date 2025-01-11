@@ -67,7 +67,7 @@ public class ParticleSwarmOptimzation {
 		swarm.setParticles(0, 0, tasklist.size());
 		ArrayList<Particle> particles = swarm.getParticles();
 		
-		for(int i = 0; i<5;i++) {
+		for(int i = 0; i<500;i++) {
 
 			for(Particle particle : particles) {
 				
@@ -86,11 +86,12 @@ public class ParticleSwarmOptimzation {
 					broker.bindCloudletToVm(tasklist.get((int)particle.getPos()[0]), vmlist.get((int)particle.getPos()[1]));
 				}
 				
-				particle.calcVelo(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 3, swarm.getGbest());
+				particle.calcVelo(particle.getVelo(), Math.sqrt(i)/tasklist.size(), particle.getPbest(), particle.getPos(), Math.sqrt(i)/tasklist.size(), swarm.getGbest());
 				particle.calcPos(particle.getPos(), particle.getVelo());
 			}
+			System.out.print(true);
 		}
-		
+		System.out.print(evaluateSchedueling(swarm.getGbest(), tasklist, vmlist));
 	}
 	
 	/**
@@ -105,12 +106,12 @@ public class ParticleSwarmOptimzation {
 	 */
 	public double evaluateSchedueling(double[] pos, ArrayList<CloudletSimple> tasks, ArrayList<Vm> vms){
 		
-		if((int)Math.round(pos[0]) >= vms.size() || (int)Math.round(pos[1]) >= vms.size()) {
+		if(Math.abs((int)Math.round(pos[0])) >= vms.size() ||  Math.abs((int)Math.round(pos[1])) >= vms.size()) {
 			return 10.0;
 		}
-		
-		Vm vm = vms.get((int) Math.round(pos[0]));
-		Cloudlet task = tasks.get((int) Math.round(pos[1]));
+
+		Vm vm = vms.get(Math.abs((int) Math.round(pos[0])));
+		Cloudlet task = tasks.get(Math.abs((int) Math.round(pos[1])));
 		double makespan = 0;
 		
 		if(vm.isSuitableForCloudlet(task)) {

@@ -28,7 +28,7 @@ import pgm.swarm.hostsimulation.VirtualMachineHandler;
  * Tests for the ParticleSwarmOptimization class.
  * 
  * @author
- * @version 1.3.0
+ * @version 1.3.1
  */
 public class ParticleSwarmOptimzationTests {
 
@@ -54,12 +54,13 @@ public class ParticleSwarmOptimzationTests {
 	}
 
 	/**
-	 * Testing evaluation method.
+	 * Testing evaluation method on positive
+	 * values.
 	 * 
 	 * @since 1.1.0
 	 */
 	@Test
-	public void testEvaluateSchedueling() {
+	public void testEvaluateScheduelingPositives() {
 		ParticleSwarmOptimzation pso;
 		VirtualMachineHandler vmh;
 		CloudLetHandler clh;
@@ -111,7 +112,58 @@ public class ParticleSwarmOptimzationTests {
 
 		assertEquals((5.0 / (5.0 * 3.0)), pso.evaluateSchedueling(test_positions[0], test_cloudlets, test_vms));
 	}
+	
+	/**
+	 * Tests negative values, so to speak index which are higher
+	 * than the size of the VM-list.
+	 * 
+	 * @since 1.3.1
+	 */
+	@Test
+	public void testEvaluateScheduelingNegatives() {
+		ParticleSwarmOptimzation pso = new ParticleSwarmOptimzation();
+		VirtualMachineHandler vmh = new VirtualMachineHandler();
+		CloudLetHandler clh = new CloudLetHandler();
+		CloudSimPlus csp = new CloudSimPlus();
+		DataCenterHandler dch = new DataCenterHandler();
+		dcb = dch.createBroker(csp);
+		
+		// Adds VMs to VMList
+		for (int i = 0; i < 1; i++) {
+			vmh.addVmToList(i, 30, 5);
+		}
+		clh.generateCloudlets(2, 2, 20);
+		double[][] test_positions = new double[3][2];
 
+		test_positions[0][0] = 2.78;
+		test_positions[0][1] = 3.1;
+
+		test_positions[1][0] = 5.10;
+		test_positions[1][1] = 5.10;
+
+		test_positions[2][0] = 10.1;
+		test_positions[2][1] = 2;
+
+		CloudletSimple test_cls_1 = new CloudletSimple(0, 3, 2);
+		CloudletSimple test_cls_2 = new CloudletSimple(1, 5, 3);
+
+		ArrayList<CloudletSimple> test_cloudlets = new ArrayList<CloudletSimple>();
+
+		test_cloudlets.add(test_cls_1);
+		test_cloudlets.add(test_cls_2);
+
+		Vm test_vm_1 = new VmSimple(5, 3);
+		Vm test_vm_2 = new VmSimple(1, 2);
+
+		ArrayList<Vm> test_vms = new ArrayList<Vm>();
+
+		test_vms.add(test_vm_1);
+		test_vms.add(test_vm_2);
+		
+		assertEquals(10, pso.evaluateSchedueling(test_positions[0], test_cloudlets, test_vms));
+		assertEquals(10, pso.evaluateSchedueling(test_positions[1], test_cloudlets, test_vms));
+	}
+	
 	/**
 	 * Testing the optimizeSchedueling method method.
 	 * 
@@ -157,7 +209,7 @@ public class ParticleSwarmOptimzationTests {
 	}
 
 	/**
-	 * Test optimizeSchedueling with only 1 * Vm and 2 * tasks.
+	 * Test optimizeSchedueling with only 2 * Vm and 2 * tasks.
 	 * 
 	 * @since 1.3.0
 	 */
@@ -184,7 +236,6 @@ public class ParticleSwarmOptimzationTests {
 		//cloudlet 1 & vm 2 -> makespan = 1 / (600 * 1) = 0,00167 x 
 		//cloudlet 2 & vm 2 -> makespan = 2 / (600 * 1) = 0,00333
 		
-		assertEquals(clh.getCloudletlist().get(0).getVm().getId(), 1);
-		
+		assertEquals(clh.getCloudletlist().get(0).getVm().getId(), 0);
 	}
 }
