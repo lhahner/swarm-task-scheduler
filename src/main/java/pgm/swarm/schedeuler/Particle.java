@@ -19,7 +19,7 @@ public class Particle implements Agent{
 	/**
 	 * stores the current velocity of the particle. 
 	 */
-	private double velo;
+	private double[] velo = new double[2];
 	
 	/**
 	 * local best values
@@ -40,7 +40,7 @@ public class Particle implements Agent{
 	 * 
 	 * @return the current velocity of a particle.
 	 */
-	public double getVelo() {
+	public double[] getVelo() {
 		return velo;
 	}
 	
@@ -59,8 +59,9 @@ public class Particle implements Agent{
 	 * 
 	 * @param the new velocity
 	 */
-	public void setVelo(double velo) {
-		this.velo = velo;
+	public void setVelo(double velo_x, double velo_y) {
+		this.velo[0] = velo_x;
+		this.velo[1] = velo_y;
 	}
 	
 	/**
@@ -69,9 +70,9 @@ public class Particle implements Agent{
 	 * @param cur_pos The initial position of the particle.
 	 * @param new_velo The new velocity upon it will change its position.
 	 */
-	public void calcPos(double[] cur_pos, double new_velo) {
+	public void calcPos(double[] cur_pos, double[] new_velo) {
 		for(int i = 0; i<this.pos.length;i++) {
-			this.pos[i] = cur_pos[i] + new_velo;
+			this.pos[i] = cur_pos[i] + new_velo[i];
 		}
 	}
 	
@@ -85,13 +86,13 @@ public class Particle implements Agent{
 	 * @param c_2 constant for weighting the values.
 	 * @param global_best possible global best position. 
 	 */
-	public void calcVelo(double cur_velo, double c_1, double[] pos_best, double[] pos, double c_2, double[] global_best) {
+	public void calcVelo(double[] cur_velo, double c_1, double[] pos_best, double[] pos, double c_2, double[] global_best) {
 		
 		double r_1 = Math.random();
 		double r_2 = Math.random();
 		
-	
-		this.velo = (double)(cur_velo + c_1 * r_1 * (pos_best[0] - pos[0]) + c_2 * r_2 * (global_best[0] - pos[0]));
+		this.setVelo((cur_velo[0] + c_1 * r_1 * (pos_best[0] - pos[0]) + c_2 * r_2 * (global_best[0] - pos[0]))
+					,(cur_velo[1] + c_1 * r_1 * (pos_best[1] - pos[1]) + c_2 * r_2 * (global_best[1] - pos[1])));
 	}
 	
 	/**
@@ -101,7 +102,7 @@ public class Particle implements Agent{
 	 */
 	@Override
 	public String toString() {
-		return "Particle{position=" + this.pos[0] + "," + this.pos[1] + ",velocity=" + this.velo + 
+		return "Particle{position=" + this.pos[0] + "," + this.pos[1] + ",velocity=" + this.velo[0] + "," + this.velo[1] + 
 			    ",pbest=" + this.pbest[0] + "," + this.pbest[1] + "} \n";
 	}
 	

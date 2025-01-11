@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.cloudsimplus.brokers.DatacenterBrokerSimple;
 import org.cloudsimplus.cloudlets.Cloudlet;
+import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 
 public class ParticleSwarmOptimzation {
@@ -60,13 +61,13 @@ public class ParticleSwarmOptimzation {
 	 * @param vmlist The VMs currently in the simulation
 	 * @param broker The broker used for binding the task to the Vm
 	 */
-	public void optimizeSchedueling(ParticleSwarm swarm, ArrayList<Cloudlet> tasklist, ArrayList<Vm> vmlist, 
+	public void optimizeSchedueling(ParticleSwarm swarm, ArrayList<CloudletSimple> tasklist, ArrayList<Vm> vmlist, 
 			DatacenterBrokerSimple broker) {
 		
 		swarm.setParticles(0, 0, tasklist.size());
 		ArrayList<Particle> particles = swarm.getParticles();
 		
-		for(int i = 0; i<2;i++) {
+		for(int i = 0; i<5;i++) {
 
 			for(Particle particle : particles) {
 				
@@ -85,7 +86,7 @@ public class ParticleSwarmOptimzation {
 					broker.bindCloudletToVm(tasklist.get((int)particle.getPos()[0]), vmlist.get((int)particle.getPos()[1]));
 				}
 				
-				particle.calcVelo(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGbest());
+				particle.calcVelo(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 3, swarm.getGbest());
 				particle.calcPos(particle.getPos(), particle.getVelo());
 			}
 		}
@@ -102,9 +103,9 @@ public class ParticleSwarmOptimzation {
 	 * @param vms Vm to be checked
 	 * @return The calculated proprety
 	 */
-	public double evaluateSchedueling(double[] pos, ArrayList<Cloudlet> tasks, ArrayList<Vm> vms){
+	public double evaluateSchedueling(double[] pos, ArrayList<CloudletSimple> tasks, ArrayList<Vm> vms){
 		
-		if((int)Math.round(pos[0]) > vms.size() || (int)Math.round(pos[1]) > vms.size()) {
+		if((int)Math.round(pos[0]) >= vms.size() || (int)Math.round(pos[1]) >= vms.size()) {
 			return 10.0;
 		}
 		

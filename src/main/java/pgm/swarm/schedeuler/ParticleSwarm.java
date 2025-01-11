@@ -32,7 +32,7 @@ public class ParticleSwarm {
 			start_x = Math.sqrt(start_x);
 			start_y = Math.sqrt(start_y);
 
-			particles.add((Particle) new ParticleFactory().getParticle(start_x, start_y, Math.random()));
+			particles.add((Particle) new ParticleFactory().getParticle(start_x, start_y, Math.random(), Math.random()));
 		}
 	}
 	
