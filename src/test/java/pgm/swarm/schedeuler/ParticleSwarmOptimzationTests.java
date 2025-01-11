@@ -27,8 +27,7 @@ import pgm.swarm.hostsimulation.VirtualMachineHandler;
 /**
  * Tests for the ParticleSwarmOptimization class.
  * 
- * @author
- * @version 1.3.1
+ * @version 1.4.0
  */
 public class ParticleSwarmOptimzationTests {
 
@@ -236,6 +235,53 @@ public class ParticleSwarmOptimzationTests {
 		//cloudlet 1 & vm 2 -> makespan = 1 / (600 * 1) = 0,00167 x 
 		//cloudlet 2 & vm 2 -> makespan = 2 / (600 * 1) = 0,00333
 		
-		assertEquals(clh.getCloudletlist().get(0).getVm().getId(), 0);
+		assertEquals(1, clh.getCloudletlist().get(0).getVm().getId());
+	}
+	
+	/**
+	 * Test optimizeSchedueling with only 4 * Vm and 2 * tasks.
+	 * 
+	 * @since 1.3.0
+	 */
+	@Test
+	public void testoptimizeScheduelingFourVmAndTwoTasks() {
+		// Setup Cloud Enviroment
+		CloudSimPlus csp1 = new CloudSimPlus();
+		
+		DataCenterHandler dch1 = new DataCenterHandler();
+		VirtualMachineHandler vmh1 = new VirtualMachineHandler();
+		CloudLetHandler clh1 = new CloudLetHandler();
+		DatacenterBrokerSimple dcb1 = new DatacenterBrokerSimple(csp1);
+		
+		dch1.createDatacenter(csp1, 1, 5);
+		vmh1.addVmToList(0, 500, 1);
+		vmh1.addVmToList(1, 600, 1);
+		vmh1.addVmToList(2, 400, 2);
+		vmh1.addVmToList(3, 500, 1);
+		
+		dcb1.submitVmList(vmh1.getVmlist());
+		
+		clh1.addToCloudletlist(0, 1, 1);
+		clh1.addToCloudletlist(1, 2, 1);
+		
+		ParticleSwarm ps = new ParticleSwarm();
+		ps.setParticles(0, 0, 2);
+		
+		pso.optimizeSchedueling(ps, clh1.getCloudletlist(), vmh1.getVmlist(), dcb1);
+		
+		//makespan = length / (getMips() * getFreePesNumber);
+		//cloudlet 1 & vm 1 -> makespan = 1 / (500 * 1) = 0,002
+		//cloudlet 2 & vm 1 -> makespan = 2 / (500 * 1) = 0,004
+		
+		//cloudlet 1 & vm 2 -> makespan = 1 / (600 * 1) = 0,00167
+		//cloudlet 2 & vm 2 -> makespan = 2 / (600 * 1) = 0,003
+		
+		//cloudlet 1 & vm 3 -> makespan = 1 / (400 * 2) = 0,00125 x
+		//cloudlet 2 & vm 3 -> makespan = 2 / (400 * 2) = 0,0025
+		
+		//cloudlet 1 & vm 4 -> makespan = 1 / (500 * 1) = 0,002
+		//cloudlet 2 & vm 4 -> makespan = 2 / (500 * 1) = 0,004
+		
+		assertEquals(2, clh1.getCloudletlist().get(0).getVm().getId());
 	}
 }

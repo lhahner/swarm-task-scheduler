@@ -39,7 +39,8 @@ public class ParticleSwarmOptimzation {
 						swarm.setGbest(particle.getPos());
 					}
 					
-					particle.calcVelo(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGbest());
+					particle.calcVelo(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGbest(),
+							Math.random(), Math.random());
 					particle.calcPos(particle.getPos(), particle.getVelo());
 					
 			}
@@ -70,23 +71,32 @@ public class ParticleSwarmOptimzation {
 		for(int i = 0; i<500;i++) {
 
 			for(Particle particle : particles) {
+				// Additional Code to limit the particle position range
+				if(particle.getPos()[0] >= vmlist.size()) {
+					particle.setPosX(Math.random());
+				}
+				if(particle.getPos()[1] >= tasklist.size()) {
+					particle.setPosY(Math.random());
+				}
 				
 				if(this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
 						< this.evaluateSchedueling(particle.getPbest(), tasklist, vmlist)) {
 					double[] pbest = particle.getPos();
 					particle.setPbest(pbest);
 					
-					broker.bindCloudletToVm(tasklist.get((int)particle.getPos()[0]), vmlist.get((int)particle.getPos()[1]));
+					broker.bindCloudletToVm(tasklist.get(Math.abs((int) Math.round(particle.getPos()[1]))), 
+							vmlist.get(Math.abs((int) Math.round(particle.getPos()[0]))));
 				}
 				
 				if(this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
 						< this.evaluateSchedueling(swarm.getGbest(), tasklist, vmlist)) {
 					swarm.setGbest(particle.getPos());
 					
-					broker.bindCloudletToVm(tasklist.get((int)particle.getPos()[0]), vmlist.get((int)particle.getPos()[1]));
+					broker.bindCloudletToVm(tasklist.get(Math.abs((int) Math.round(particle.getPos()[1]))), 
+							vmlist.get(Math.abs((int) Math.round(particle.getPos()[0]))));
 				}
 				
-				particle.calcVelo(particle.getVelo(), Math.sqrt(i)/tasklist.size(), particle.getPbest(), particle.getPos(), Math.sqrt(i)/tasklist.size(), swarm.getGbest());
+				particle.calcVelo(particle.getVelo(), tasklist.size()/100, particle.getPbest(), particle.getPos(), vmlist.size()/100, swarm.getGbest(),Math.random(), Math.random());
 				particle.calcPos(particle.getPos(), particle.getVelo());
 			}
 			System.out.print(true);
@@ -106,7 +116,7 @@ public class ParticleSwarmOptimzation {
 	 */
 	public double evaluateSchedueling(double[] pos, ArrayList<CloudletSimple> tasks, ArrayList<Vm> vms){
 		
-		if(Math.abs((int)Math.round(pos[0])) >= vms.size() ||  Math.abs((int)Math.round(pos[1])) >= vms.size()) {
+		if(Math.abs((int)Math.round(pos[0])) >= vms.size() ||  Math.abs((int)Math.round(pos[1])) >= tasks.size()) {
 			return 10.0;
 		}
 

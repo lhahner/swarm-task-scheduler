@@ -65,6 +65,22 @@ public class Particle implements Agent{
 	}
 	
 	/**
+	 * Set the x coordinate
+	 * @param x the value
+	 */
+	public void setPosX(double x) {
+		this.pos[0] = x;
+	}
+	
+	/**
+	 * Set the y coordinate
+	 * @param y the value
+	 */
+	public void setPosY(double y) {
+		this.pos[1] = y;
+	}
+	
+	/**
 	 * Set the current position by adding the velocity
 	 * 
 	 * @param cur_pos The initial position of the particle.
@@ -86,13 +102,14 @@ public class Particle implements Agent{
 	 * @param c_2 constant for weighting the values.
 	 * @param global_best possible global best position. 
 	 */
-	public void calcVelo(double[] cur_velo, double c_1, double[] pos_best, double[] pos, double c_2, double[] global_best) {
+	public void calcVelo(double[] cur_velo, double c_1, double[] pos_best, double[] pos, double c_2, double[] global_best
+			,double r_1, double r_2) {
 		
-		double r_1 = Math.random();
-		double r_2 = Math.random();
+		double velo_x = (cur_velo[0] + c_1 * r_1 * (pos_best[0] - pos[0]) + c_2 * r_2 * (global_best[0] - pos[0]));
+		double velo_y = (cur_velo[1] + c_1 * r_1 * (pos_best[1] - pos[1]) + c_2 * r_2 * (global_best[1] - pos[1]));
 		
-		this.setVelo((cur_velo[0] + c_1 * r_1 * (pos_best[0] - pos[0]) + c_2 * r_2 * (global_best[0] - pos[0]))
-					,(cur_velo[1] + c_1 * r_1 * (pos_best[1] - pos[1]) + c_2 * r_2 * (global_best[1] - pos[1])));
+		this.setVelo(velo_x, velo_y);
+		
 	}
 	
 	/**
