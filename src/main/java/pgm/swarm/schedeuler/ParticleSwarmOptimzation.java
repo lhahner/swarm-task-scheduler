@@ -8,6 +8,8 @@ import org.cloudsimplus.cloudlets.Cloudlet;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 
+import pgm.swarm.visualization.SwarmVisualizer;
+
 public class ParticleSwarmOptimzation {
 	
 	/**
@@ -99,9 +101,8 @@ public class ParticleSwarmOptimzation {
 				particle.calcVelo(particle.getVelo(), tasklist.size()/100, particle.getPbest(), particle.getPos(), vmlist.size()/100, swarm.getGbest(),Math.random(), Math.random());
 				particle.calcPos(particle.getPos(), particle.getVelo());
 			}
-			System.out.print(true);
+			new SwarmVisualizer().setDataSerieslist(swarm, i);
 		}
-		System.out.print(evaluateSchedueling(swarm.getGbest(), tasklist, vmlist));
 	}
 	
 	/**

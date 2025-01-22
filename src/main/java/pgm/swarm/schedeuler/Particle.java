@@ -4,7 +4,6 @@ package pgm.swarm.schedeuler;
  * Particle which is part of the Particle-Swarm-Optimization 
  * algorithm.
  * 
- * TODO Make the velocity as an array.
  * 
  * @version 1.0.0
  * @author Lennart Hahner

@@ -229,11 +229,11 @@ public class ParticleSwarmOptimzationTests {
 		pso.optimizeSchedueling(ps, clh.getCloudletlist(), vmh.getVmlist(), dcb);
 		
 		//makespan = length / (getMips() * getFreePesNumber);
-		//cloudlet 1 & vm 1 -> makespan = 1 / (500 * 1) = 0,002
-		//cloudlet 2 & vm 1 -> makespan = 2 / (500 * 1) = 0,004
+		//cloudlet 0 & vm 0 -> makespan = 1 / (500 * 1) = 0,002
+		//cloudlet 1 & vm 0 -> makespan = 2 / (500 * 1) = 0,004
 		
-		//cloudlet 1 & vm 2 -> makespan = 1 / (600 * 1) = 0,00167 x 
-		//cloudlet 2 & vm 2 -> makespan = 2 / (600 * 1) = 0,00333
+		//cloudlet 0 & vm 1 -> makespan = 1 / (600 * 1) = 0,00167 x 
+		//cloudlet 1 & vm 1 -> makespan = 2 / (600 * 1) = 0,00333
 		
 		assertEquals(1, clh.getCloudletlist().get(0).getVm().getId());
 	}
@@ -270,17 +270,17 @@ public class ParticleSwarmOptimzationTests {
 		pso.optimizeSchedueling(ps, clh1.getCloudletlist(), vmh1.getVmlist(), dcb1);
 		
 		//makespan = length / (getMips() * getFreePesNumber);
-		//cloudlet 1 & vm 1 -> makespan = 1 / (500 * 1) = 0,002
-		//cloudlet 2 & vm 1 -> makespan = 2 / (500 * 1) = 0,004
+		//cloudlet 0 & vm 0 -> makespan = 1 / (500 * 1) = 0,002
+		//cloudlet 1 & vm 0 -> makespan = 2 / (500 * 1) = 0,004
 		
-		//cloudlet 1 & vm 2 -> makespan = 1 / (600 * 1) = 0,00167
-		//cloudlet 2 & vm 2 -> makespan = 2 / (600 * 1) = 0,003
+		//cloudlet 0 & vm 1 -> makespan = 1 / (600 * 1) = 0,00167
+		//cloudlet 1 & vm 1 -> makespan = 2 / (600 * 1) = 0,003
 		
-		//cloudlet 1 & vm 3 -> makespan = 1 / (400 * 2) = 0,00125 x
-		//cloudlet 2 & vm 3 -> makespan = 2 / (400 * 2) = 0,0025
+		//cloudlet 0 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
+		//cloudlet 1 & vm 2 -> makespan = 2 / (400 * 2) = 0,0025
 		
-		//cloudlet 1 & vm 4 -> makespan = 1 / (500 * 1) = 0,002
-		//cloudlet 2 & vm 4 -> makespan = 2 / (500 * 1) = 0,004
+		//cloudlet 0 & vm 3 -> makespan = 1 / (500 * 1) = 0,002
+		//cloudlet 1 & vm 3 -> makespan = 2 / (500 * 1) = 0,004
 		
 		assertEquals(2, clh1.getCloudletlist().get(0).getVm().getId());
 	}
