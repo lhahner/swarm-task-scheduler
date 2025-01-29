@@ -1,4 +1,4 @@
-package pgm.swarm.hostsimulation;
+package pgm.swarm.simulation;
 
 import java.util.ArrayList;
 
@@ -12,7 +12,7 @@ import org.cloudsimplus.vms.*;
  * @author lennart.hahner
  * @version 1.0.0
  */
-public class VirtualMachineHandler {
+public class VirtualMachineUtility {
 	
 	/**
 	 * The list of virtual-machines used.

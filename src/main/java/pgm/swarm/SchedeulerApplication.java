@@ -11,10 +11,10 @@ import org.cloudsimplus.core.CloudSimTag;
 import org.cloudsimplus.datacenters.Datacenter;
 import org.cloudsimplus.datacenters.DatacenterSimple;
 
-import pgm.swarm.hostsimulation.CloudLetHandler;
-import pgm.swarm.hostsimulation.DataCenterHandler;
-import pgm.swarm.hostsimulation.VirtualMachineHandler;
 import pgm.swarm.schedeuler.ParticleSwarmOptimzation;
+import pgm.swarm.simulation.CloudLetUtility;
+import pgm.swarm.simulation.DataCenterUtility;
+import pgm.swarm.simulation.VirtualMachineUtility;
 import pgm.swarm.visualization.SwarmVisualizer;
 import pgm.swarm.schedeuler.ParticleSwarm;
 

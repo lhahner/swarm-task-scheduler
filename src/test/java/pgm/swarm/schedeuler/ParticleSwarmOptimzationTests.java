@@ -20,9 +20,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import pgm.swarm.hostsimulation.CloudLetHandler;
-import pgm.swarm.hostsimulation.DataCenterHandler;
-import pgm.swarm.hostsimulation.VirtualMachineHandler;
+import pgm.swarm.simulation.CloudLetUtility;
+import pgm.swarm.simulation.DataCenterUtility;
+import pgm.swarm.simulation.DataCenterUtility;
+import pgm.swarm.simulation.VirtualMachineUtility;
 
 /**
  * Tests for the ParticleSwarmOptimization class.
@@ -32,10 +33,10 @@ import pgm.swarm.hostsimulation.VirtualMachineHandler;
 public class ParticleSwarmOptimzationTests {
 
 	ParticleSwarmOptimzation pso;
-	VirtualMachineHandler vmh;
-	CloudLetHandler clh;
+	VirtualMachineUtility vmh;
+	CloudLetUtility clh;
 	CloudSimPlus csp;
-	DataCenterHandler dch;
+	DataCenterUtility dch;
 	DatacenterBrokerSimple dcb;
 
 	/**
@@ -45,9 +46,9 @@ public class ParticleSwarmOptimzationTests {
 	@BeforeEach
 	public void runtests() {
 		pso = new ParticleSwarmOptimzation();
-		vmh = new VirtualMachineHandler();
-		clh = new CloudLetHandler();
-		dch = new DataCenterHandler();
+		vmh = new VirtualMachineUtility();
+		clh = new CloudLetUtility();
+		dch = new DataCenterUtility();
 		csp = new CloudSimPlus();
 		dcb = dch.createBroker(csp);
 	}
@@ -61,15 +62,15 @@ public class ParticleSwarmOptimzationTests {
 	@Test
 	public void testEvaluateScheduelingPositives() {
 		ParticleSwarmOptimzation pso;
-		VirtualMachineHandler vmh;
-		CloudLetHandler clh;
+		VirtualMachineUtility vmh;
+		CloudLetUtility clh;
 		CloudSimPlus csp;
-		DataCenterHandler dch;
+		DataCenterUtility dch;
 		DatacenterBrokerSimple dcb;
 		pso = new ParticleSwarmOptimzation();
-		vmh = new VirtualMachineHandler();
-		clh = new CloudLetHandler();
-		dch = new DataCenterHandler();
+		vmh = new VirtualMachineUtility();
+		clh = new CloudLetUtility();
+		dch = new DataCenterUtility();
 		csp = new CloudSimPlus();
 		dcb = dch.createBroker(csp);
 		
@@ -121,10 +122,10 @@ public class ParticleSwarmOptimzationTests {
 	@Test
 	public void testEvaluateScheduelingNegatives() {
 		ParticleSwarmOptimzation pso = new ParticleSwarmOptimzation();
-		VirtualMachineHandler vmh = new VirtualMachineHandler();
-		CloudLetHandler clh = new CloudLetHandler();
+		VirtualMachineUtility vmh = new VirtualMachineUtility();
+		CloudLetUtility clh = new CloudLetUtility();
 		CloudSimPlus csp = new CloudSimPlus();
-		DataCenterHandler dch = new DataCenterHandler();
+		DataCenterUtility dch = new DataCenterUtility();
 		dcb = dch.createBroker(csp);
 		
 		// Adds VMs to VMList
@@ -248,9 +249,9 @@ public class ParticleSwarmOptimzationTests {
 		// Setup Cloud Enviroment
 		CloudSimPlus csp1 = new CloudSimPlus();
 		
-		DataCenterHandler dch1 = new DataCenterHandler();
-		VirtualMachineHandler vmh1 = new VirtualMachineHandler();
-		CloudLetHandler clh1 = new CloudLetHandler();
+		DataCenterUtility dch1 = new DataCenterUtility();
+		VirtualMachineUtility vmh1 = new VirtualMachineUtility();
+		CloudLetUtility clh1 = new CloudLetUtility();
 		DatacenterBrokerSimple dcb1 = new DatacenterBrokerSimple(csp1);
 		
 		dch1.createDatacenter(csp1, 1, 5);

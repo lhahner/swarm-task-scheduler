@@ -1,4 +1,4 @@
-package pgm.swarm.hostsimulation;
+package pgm.swarm.simulation;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,7 +15,7 @@ import org.cloudsimplus.vms.Vm;
  * @author lennart.hahner
  * @version 1.0.0
  */
-public class CloudLetHandler {
+public class CloudLetUtility {
 	
 	ArrayList<CloudletSimple> cloudletlist = new ArrayList<CloudletSimple>();
 	
