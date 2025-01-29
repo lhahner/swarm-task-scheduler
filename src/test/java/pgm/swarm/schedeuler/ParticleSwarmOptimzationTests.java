@@ -221,13 +221,13 @@ public class ParticleSwarmOptimzationTests {
 		vmh.addVmToList(1, 600, 1);
 		dcb.submitVmList(vmh.getVmlist());
 		
-		clh.addToCloudletlist(0, 1, 1);
-		clh.addToCloudletlist(1, 2, 1);
+		clh.addCloudlet(0, 1, 1);
+		clh.addCloudlet(1, 2, 1);
 		
 		ParticleSwarm ps = new ParticleSwarm();
 		ps.setParticles(0, 0, 2);
 		
-		pso.optimizeSchedueling(ps, clh.getCloudletlist(), vmh.getVmlist(), dcb);
+		pso.optimizeSchedueling(ps, clh.getCloudletList(), vmh.getVmlist(), dcb);
 		
 		//makespan = length / (getMips() * getFreePesNumber);
 		//cloudlet 0 & vm 0 -> makespan = 1 / (500 * 1) = 0,002
@@ -236,7 +236,7 @@ public class ParticleSwarmOptimzationTests {
 		//cloudlet 0 & vm 1 -> makespan = 1 / (600 * 1) = 0,00167 x 
 		//cloudlet 1 & vm 1 -> makespan = 2 / (600 * 1) = 0,00333
 		
-		assertEquals(1, clh.getCloudletlist().get(0).getVm().getId());
+		assertEquals(1, clh.getCloudletList().get(0).getVm().getId());
 	}
 	
 	/**
@@ -262,13 +262,13 @@ public class ParticleSwarmOptimzationTests {
 		
 		dcb1.submitVmList(vmh1.getVmlist());
 		
-		clh1.addToCloudletlist(0, 1, 1);
-		clh1.addToCloudletlist(1, 2, 1);
+		clh1.addCloudlet(0, 1, 1);
+		clh1.addCloudlet(1, 2, 1);
 		
 		ParticleSwarm ps = new ParticleSwarm();
 		ps.setParticles(0, 0, 2);
 		
-		pso.optimizeSchedueling(ps, clh1.getCloudletlist(), vmh1.getVmlist(), dcb1);
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1);
 		
 		//makespan = length / (getMips() * getFreePesNumber);
 		//cloudlet 0 & vm 0 -> makespan = 1 / (500 * 1) = 0,002
@@ -283,6 +283,6 @@ public class ParticleSwarmOptimzationTests {
 		//cloudlet 0 & vm 3 -> makespan = 1 / (500 * 1) = 0,002
 		//cloudlet 1 & vm 3 -> makespan = 2 / (500 * 1) = 0,004
 		
-		assertEquals(2, clh1.getCloudletlist().get(0).getVm().getId());
+		assertEquals(2, clh1.getCloudletList().get(0).getVm().getId());
 	}
 }
