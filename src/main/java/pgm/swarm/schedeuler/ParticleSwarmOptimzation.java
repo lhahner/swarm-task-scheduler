@@ -71,13 +71,7 @@ public class ParticleSwarmOptimzation {
             
             for (Particle particle : particles) {
                 
-                // Ensure particle position remains within valid VM and task index range.
-                if (particle.getPos()[0] >= vmlist.size()) {
-                    particle.setPosX(Math.random());
-                }
-                if (particle.getPos()[1] >= tasklist.size()) {
-                    particle.setPosY(Math.random());
-                }
+            	resetParticlesOutOfRange(particle, vmlist, tasklist);
                 
                 // Update personal best (pbest) if the new position results in a lower makespan.
                 if (this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
@@ -129,5 +123,23 @@ public class ParticleSwarmOptimzation {
             return 10.0; // Default high value if the VM is unsuitable.
         }
         return makespan;
+    }
+    
+    /**
+     * This method will check if the postion of the particle is too large to be in the scope
+     * of the provided VMs and provided Tasks and afterwards will set the position of the particles
+     * to random.
+     * 
+     * @param particle The particle which should be checked and changed.
+     * @param vmlist The List of VMs used.
+     * @param tasklist The List of Tasks used.
+     */
+    private void resetParticlesOutOfRange(Particle particle, ArrayList<Vm> vmlist, ArrayList<CloudletSimple> tasklist) {
+    	if (particle.getPos()[0] >= vmlist.size()) {
+            particle.setPosX(Math.random());
+        }
+        if (particle.getPos()[1] >= tasklist.size()) {
+            particle.setPosY(Math.random());
+        }
     }
 }
