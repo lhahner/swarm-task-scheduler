@@ -76,7 +76,7 @@ public class ParticleSwarmOptimzationTests {
 		
 		// Adds VMs to VMList
 		for (int i = 0; i < 5; i++) {
-			vmh.addVmToList(i, 30, 5);
+			vmh.addVm(i, 30, 5);
 		}
 		clh.generateCloudlets(2, 2, 20);
 		double[][] test_positions = new double[3][2];
@@ -130,7 +130,7 @@ public class ParticleSwarmOptimzationTests {
 		
 		// Adds VMs to VMList
 		for (int i = 0; i < 1; i++) {
-			vmh.addVmToList(i, 30, 5);
+			vmh.addVm(i, 30, 5);
 		}
 		clh.generateCloudlets(2, 2, 20);
 		double[][] test_positions = new double[3][2];
@@ -173,7 +173,7 @@ public class ParticleSwarmOptimzationTests {
 	public void testOptimizeSchedueling() {
 		// Adds VMs to VMList
 		for (int i = 0; i < 5; i++) {
-			vmh.addVmToList(i, 30, 5);
+			vmh.addVm(i, 30, 5);
 		}
 		clh.generateCloudlets(2, 2, 20);
 		ParticleSwarm swarm = new ParticleSwarm();
@@ -217,8 +217,8 @@ public class ParticleSwarmOptimzationTests {
 	public void testoptimizeScheduelingOneVmAndTwoTasks() {
 		// Setup Cloud Enviroment
 		dch.createDatacenter(csp, 1, 5);
-		vmh.addVmToList(0, 500, 1);
-		vmh.addVmToList(1, 600, 1);
+		vmh.addVm(0, 500, 1);
+		vmh.addVm(1, 600, 1);
 		dcb.submitVmList(vmh.getVmlist());
 		
 		clh.addCloudlet(0, 1, 1);
@@ -255,10 +255,10 @@ public class ParticleSwarmOptimzationTests {
 		DatacenterBrokerSimple dcb1 = new DatacenterBrokerSimple(csp1);
 		
 		dch1.createDatacenter(csp1, 1, 5);
-		vmh1.addVmToList(0, 500, 1);
-		vmh1.addVmToList(1, 600, 1);
-		vmh1.addVmToList(2, 400, 2);
-		vmh1.addVmToList(3, 500, 1);
+		vmh1.addVm(0, 500, 1);
+		vmh1.addVm(1, 600, 1);
+		vmh1.addVm(2, 400, 2);
+		vmh1.addVm(3, 500, 1);
 		
 		dcb1.submitVmList(vmh1.getVmlist());
 		
