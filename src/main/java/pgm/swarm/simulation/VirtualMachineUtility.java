@@ -51,7 +51,6 @@ public class VirtualMachineUtility {
         }
 
     }
-    
     /**
      * Adds a new virtual machine with a specific ID, MIPS, and number of PEs.
      * 
@@ -133,7 +132,7 @@ public class VirtualMachineUtility {
     public String toString() {
     	String vmStats = "";
         for(Vm vm : this.vmlist) {
-        	vmStats = vmStats + "CPU % Utilization: " + vm.getHost().getCpuUtilizationStats().getMean();
+        	vmStats = vmStats + "CPU % Utilization: " + vm.getHost().getCpuUtilizationStats().getMean() + "\n";
         }
         return vmStats;
     }	
