@@ -45,8 +45,8 @@ public class DataCenterUtility {
 	private int mips; //Millions Instructions Per Second
 	
 	/* The DataCenter Broker for the created Datacenter,created by createBroker() */
-	DatacenterBrokerSimple broker = null;
-	Datacenter datacenter;
+	private DatacenterBrokerSimple broker = null;
+	private Datacenter datacenter;
 	
 	/**
 	 * Default Contstructor, use this constructor to create a predefinied 

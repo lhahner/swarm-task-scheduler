@@ -28,11 +28,11 @@ public class ParticleSwarmOptimzation {
      */
     public void optimize(ParticleSwarm swarm, double startpos_x, double startpos_y, int swarmsize) {
         
-        swarm.setParticles(startpos_x, startpos_y, swarmsize);
+        swarm.setAgents(startpos_x, startpos_y, swarmsize);
         
         for (int i = 0; i < swarmsize; i++) {
             
-            for (Particle particle : swarm.getParticles()) {
+            for (Particle particle : swarm.getAgents()) {
                 
                 // Update personal best (pbest) position if current position is better.
                 if (particle.evaluate(particle.getPos()) < particle.evaluate(particle.getPbest())) {
@@ -64,8 +64,8 @@ public class ParticleSwarmOptimzation {
      */
     public void optimizeSchedueling(ParticleSwarm swarm, ArrayList<CloudletSimple> tasklist, ArrayList<Vm> vmlist, DatacenterBrokerSimple broker) {
         
-        swarm.setParticles(0, 0, tasklist.size());
-        ArrayList<Particle> particles = swarm.getParticles();
+        swarm.setAgents(0, 0, tasklist.size());
+        ArrayList<Particle> particles = swarm.getAgents();
         
         for (int i = 0; i < 500; i++) {
             

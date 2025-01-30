@@ -2,7 +2,7 @@ package pgm.swarm.schedeuler;
 
 import java.util.ArrayList;
 
-public class ParticleSwarm {
+public class ParticleSwarm implements Swarm<Particle>{
 	
 	
 	/**
@@ -23,10 +23,9 @@ public class ParticleSwarm {
 	 * @param start_y y position to start.
 	 * @param size the size of the array.
 	 */
-	public void setParticles(double start_x, double start_y, int size) {
+	public void setAgents(double start_x, double start_y, int size) {
 
 		particles = new ArrayList<Particle>();
-		
 		for (int i = 0; size > i; i++) {
 
 			start_x = Math.sqrt(start_x);
@@ -41,7 +40,7 @@ public class ParticleSwarm {
 	 * 
 	 * @return The swarm of particles.
 	 */
-	public ArrayList<Particle> getParticles(){
+	public ArrayList<Particle> getAgents(){
 		return this.particles;
 	}
 	
@@ -66,7 +65,7 @@ public class ParticleSwarm {
 	public String toString() {
 		String swarm_str = "\n";
 		
-		for(Particle particle : this.getParticles()) {
+		for(Particle particle : this.getAgents()) {
 			swarm_str = swarm_str + particle.toString();
 		}
 		

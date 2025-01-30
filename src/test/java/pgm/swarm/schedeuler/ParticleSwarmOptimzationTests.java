@@ -177,7 +177,7 @@ public class ParticleSwarmOptimzationTests {
 		}
 		clh.generateCloudlets(2, 2, 20);
 		ParticleSwarm swarm = new ParticleSwarm();
-		swarm.setParticles(0, 0, 3);
+		swarm.setAgents(0, 0, 3);
 
 		CloudSimPlus csp = new CloudSimPlus();
 		DatacenterSimple dcs = new DatacenterSimple(csp, new VmAllocationPolicySimple());
@@ -225,7 +225,7 @@ public class ParticleSwarmOptimzationTests {
 		clh.addCloudlet(1, 2, 1);
 		
 		ParticleSwarm ps = new ParticleSwarm();
-		ps.setParticles(0, 0, 2);
+		ps.setAgents(0, 0, 2);
 		
 		pso.optimizeSchedueling(ps, clh.getCloudletList(), vmh.getVmlist(), dcb);
 		
@@ -266,7 +266,7 @@ public class ParticleSwarmOptimzationTests {
 		clh1.addCloudlet(1, 2, 1);
 		
 		ParticleSwarm ps = new ParticleSwarm();
-		ps.setParticles(0, 0, 2);
+		ps.setAgents(0, 0, 2);
 		
 		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1);
 		
