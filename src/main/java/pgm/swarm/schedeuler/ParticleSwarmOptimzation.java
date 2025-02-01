@@ -13,6 +13,8 @@ import pgm.swarm.visualization.SwarmVisualizer;
 /**
  * Class for performing Particle Swarm Optimization (PSO) on different problems.
  * 
+ * Point of Interest -> Scaleability
+ * 
  * @version 1.5.0
  * @author lennart.hahner 
  */
@@ -133,13 +135,16 @@ public class ParticleSwarmOptimzation {
      * @param particle The particle which should be checked and changed.
      * @param vmlist The List of VMs used.
      * @param tasklist The List of Tasks used.
+     * @param scalingFactor is used to set the random assignment of the particles to a proper starting value, to not to start to low.
      */
     private void resetParticlesOutOfRange(Particle particle, ArrayList<Vm> vmlist, ArrayList<CloudletSimple> tasklist) {
+    	int scalingFactor = tasklist.size() > vmlist.size() ? tasklist.size() : vmlist.size();
+    	
     	if (particle.getPos()[0] >= vmlist.size()) {
-            particle.setPosX(Math.random());
+            particle.setPosX(Math.random() * scalingFactor);
         }
         if (particle.getPos()[1] >= tasklist.size()) {
-            particle.setPosY(Math.random());
+            particle.setPosY(Math.random() * scalingFactor);
         }
     }
 }
