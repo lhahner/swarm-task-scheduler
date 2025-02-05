@@ -30,7 +30,6 @@ public class SwarmFactory {
 		}
 		return null;
 	}
-	
 	/**
 	 * TODO Check regarding a different method instead
 	 * of using the String as an identfier for a certain
@@ -53,4 +52,5 @@ public class SwarmFactory {
 			return null;
 		}
 	}
+	
 }

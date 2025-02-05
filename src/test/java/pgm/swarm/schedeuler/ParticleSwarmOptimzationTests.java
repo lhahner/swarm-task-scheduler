@@ -20,22 +20,23 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import pgm.swarm.hostsimulation.CloudLetHandler;
-import pgm.swarm.hostsimulation.DataCenterHandler;
-import pgm.swarm.hostsimulation.VirtualMachineHandler;
+import pgm.swarm.simulation.CloudLetUtility;
+import pgm.swarm.simulation.DataCenterUtility;
+import pgm.swarm.simulation.DataCenterUtility;
+import pgm.swarm.simulation.VirtualMachineUtility;
 
 /**
  * Tests for the ParticleSwarmOptimization class.
  * 
- * @version 1.4.0
+ * @version 1.5.0
  */
 public class ParticleSwarmOptimzationTests {
 
 	ParticleSwarmOptimzation pso;
-	VirtualMachineHandler vmh;
-	CloudLetHandler clh;
+	VirtualMachineUtility vmh;
+	CloudLetUtility clh;
 	CloudSimPlus csp;
-	DataCenterHandler dch;
+	DataCenterUtility dch;
 	DatacenterBrokerSimple dcb;
 
 	/**
@@ -45,9 +46,9 @@ public class ParticleSwarmOptimzationTests {
 	@BeforeEach
 	public void runtests() {
 		pso = new ParticleSwarmOptimzation();
-		vmh = new VirtualMachineHandler();
-		clh = new CloudLetHandler();
-		dch = new DataCenterHandler();
+		vmh = new VirtualMachineUtility();
+		clh = new CloudLetUtility();
+		dch = new DataCenterUtility();
 		csp = new CloudSimPlus();
 		dcb = dch.createBroker(csp);
 	}
@@ -61,21 +62,21 @@ public class ParticleSwarmOptimzationTests {
 	@Test
 	public void testEvaluateScheduelingPositives() {
 		ParticleSwarmOptimzation pso;
-		VirtualMachineHandler vmh;
-		CloudLetHandler clh;
+		VirtualMachineUtility vmh;
+		CloudLetUtility clh;
 		CloudSimPlus csp;
-		DataCenterHandler dch;
+		DataCenterUtility dch;
 		DatacenterBrokerSimple dcb;
 		pso = new ParticleSwarmOptimzation();
-		vmh = new VirtualMachineHandler();
-		clh = new CloudLetHandler();
-		dch = new DataCenterHandler();
+		vmh = new VirtualMachineUtility();
+		clh = new CloudLetUtility();
+		dch = new DataCenterUtility();
 		csp = new CloudSimPlus();
 		dcb = dch.createBroker(csp);
 		
 		// Adds VMs to VMList
 		for (int i = 0; i < 5; i++) {
-			vmh.addVmToList(i, 30, 5);
+			vmh.addVm(i, 30, 5);
 		}
 		clh.generateCloudlets(2, 2, 20);
 		double[][] test_positions = new double[3][2];
@@ -121,15 +122,15 @@ public class ParticleSwarmOptimzationTests {
 	@Test
 	public void testEvaluateScheduelingNegatives() {
 		ParticleSwarmOptimzation pso = new ParticleSwarmOptimzation();
-		VirtualMachineHandler vmh = new VirtualMachineHandler();
-		CloudLetHandler clh = new CloudLetHandler();
+		VirtualMachineUtility vmh = new VirtualMachineUtility();
+		CloudLetUtility clh = new CloudLetUtility();
 		CloudSimPlus csp = new CloudSimPlus();
-		DataCenterHandler dch = new DataCenterHandler();
+		DataCenterUtility dch = new DataCenterUtility();
 		dcb = dch.createBroker(csp);
 		
 		// Adds VMs to VMList
 		for (int i = 0; i < 1; i++) {
-			vmh.addVmToList(i, 30, 5);
+			vmh.addVm(i, 30, 5);
 		}
 		clh.generateCloudlets(2, 2, 20);
 		double[][] test_positions = new double[3][2];
@@ -172,11 +173,11 @@ public class ParticleSwarmOptimzationTests {
 	public void testOptimizeSchedueling() {
 		// Adds VMs to VMList
 		for (int i = 0; i < 5; i++) {
-			vmh.addVmToList(i, 30, 5);
+			vmh.addVm(i, 30, 5);
 		}
 		clh.generateCloudlets(2, 2, 20);
 		ParticleSwarm swarm = new ParticleSwarm();
-		swarm.setParticles(0, 0, 3);
+		swarm.setAgents(0, 0, 3);
 
 		CloudSimPlus csp = new CloudSimPlus();
 		DatacenterSimple dcs = new DatacenterSimple(csp, new VmAllocationPolicySimple());
@@ -216,17 +217,17 @@ public class ParticleSwarmOptimzationTests {
 	public void testoptimizeScheduelingOneVmAndTwoTasks() {
 		// Setup Cloud Enviroment
 		dch.createDatacenter(csp, 1, 5);
-		vmh.addVmToList(0, 500, 1);
-		vmh.addVmToList(1, 600, 1);
+		vmh.addVm(0, 500, 1);
+		vmh.addVm(1, 600, 1);
 		dcb.submitVmList(vmh.getVmlist());
 		
-		clh.addToCloudletlist(0, 1, 1);
-		clh.addToCloudletlist(1, 2, 1);
+		clh.addCloudlet(0, 1, 1);
+		clh.addCloudlet(1, 2, 1);
 		
 		ParticleSwarm ps = new ParticleSwarm();
-		ps.setParticles(0, 0, 2);
+		ps.setAgents(0, 0, 2);
 		
-		pso.optimizeSchedueling(ps, clh.getCloudletlist(), vmh.getVmlist(), dcb);
+		pso.optimizeSchedueling(ps, clh.getCloudletList(), vmh.getVmlist(), dcb);
 		
 		//makespan = length / (getMips() * getFreePesNumber);
 		//cloudlet 0 & vm 0 -> makespan = 1 / (500 * 1) = 0,002
@@ -235,7 +236,7 @@ public class ParticleSwarmOptimzationTests {
 		//cloudlet 0 & vm 1 -> makespan = 1 / (600 * 1) = 0,00167 x 
 		//cloudlet 1 & vm 1 -> makespan = 2 / (600 * 1) = 0,00333
 		
-		assertEquals(1, clh.getCloudletlist().get(0).getVm().getId());
+		assertEquals(1, clh.getCloudletList().get(0).getVm().getId());
 	}
 	
 	/**
@@ -248,26 +249,26 @@ public class ParticleSwarmOptimzationTests {
 		// Setup Cloud Enviroment
 		CloudSimPlus csp1 = new CloudSimPlus();
 		
-		DataCenterHandler dch1 = new DataCenterHandler();
-		VirtualMachineHandler vmh1 = new VirtualMachineHandler();
-		CloudLetHandler clh1 = new CloudLetHandler();
+		DataCenterUtility dch1 = new DataCenterUtility();
+		VirtualMachineUtility vmh1 = new VirtualMachineUtility();
+		CloudLetUtility clh1 = new CloudLetUtility();
 		DatacenterBrokerSimple dcb1 = new DatacenterBrokerSimple(csp1);
 		
 		dch1.createDatacenter(csp1, 1, 5);
-		vmh1.addVmToList(0, 500, 1);
-		vmh1.addVmToList(1, 600, 1);
-		vmh1.addVmToList(2, 400, 2);
-		vmh1.addVmToList(3, 500, 1);
+		vmh1.addVm(0, 500, 1);
+		vmh1.addVm(1, 600, 1);
+		vmh1.addVm(2, 400, 2);
+		vmh1.addVm(3, 500, 1);
 		
 		dcb1.submitVmList(vmh1.getVmlist());
 		
-		clh1.addToCloudletlist(0, 1, 1);
-		clh1.addToCloudletlist(1, 2, 1);
+		clh1.addCloudlet(0, 1, 1);
+		clh1.addCloudlet(1, 2, 1);
 		
 		ParticleSwarm ps = new ParticleSwarm();
-		ps.setParticles(0, 0, 2);
+		ps.setAgents(0, 0, 2);
 		
-		pso.optimizeSchedueling(ps, clh1.getCloudletlist(), vmh1.getVmlist(), dcb1);
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1);
 		
 		//makespan = length / (getMips() * getFreePesNumber);
 		//cloudlet 0 & vm 0 -> makespan = 1 / (500 * 1) = 0,002
@@ -282,6 +283,96 @@ public class ParticleSwarmOptimzationTests {
 		//cloudlet 0 & vm 3 -> makespan = 1 / (500 * 1) = 0,002
 		//cloudlet 1 & vm 3 -> makespan = 2 / (500 * 1) = 0,004
 		
-		assertEquals(2, clh1.getCloudletlist().get(0).getVm().getId());
+		assertEquals(2, clh1.getCloudletList().get(0).getVm().getId());
+	}
+	
+	/**
+	 * Test optimizeSchedueling with only 10 * Vm and 6 * tasks.
+	 * 
+	 * @since 1.5.0
+	 */
+	@Test
+	public void testoptimizeScheduelingTenVmsAndSixTasks() {
+		// Setup Cloud Enviroment
+		CloudSimPlus csp1 = new CloudSimPlus();
+		
+		DataCenterUtility dch1 = new DataCenterUtility();
+		VirtualMachineUtility vmh1 = new VirtualMachineUtility();
+		CloudLetUtility clh1 = new CloudLetUtility();
+		DatacenterBrokerSimple dcb1 = new DatacenterBrokerSimple(csp1);
+		
+		dch1.createDatacenter(csp1, 1, 5);
+		vmh1.addVm(0, 500, 1);
+		vmh1.addVm(1, 600, 1);
+		vmh1.addVm(2, 400, 2); //possible best
+		vmh1.addVm(3, 500, 1);
+		vmh1.addVm(4, 500, 1);
+		vmh1.addVm(5, 600, 1);
+		vmh1.addVm(6, 500, 1);
+		vmh1.addVm(7, 500, 1);
+		vmh1.addVm(8, 500, 1);
+		vmh1.addVm(9, 600, 1);
+		
+		dcb1.submitVmList(vmh1.getVmlist());
+		
+		clh1.addCloudlet(0, 2, 1);
+		clh1.addCloudlet(1, 1, 1);  //possible best
+		clh1.addCloudlet(2, 2, 1);
+		clh1.addCloudlet(3, 2, 1);
+		clh1.addCloudlet(4, 2, 1);
+		clh1.addCloudlet(5, 2, 1);
+		clh1.addCloudlet(6, 2, 1);
+		clh1.addCloudlet(7, 2, 1);
+		
+		ParticleSwarm ps = new ParticleSwarm();
+		ps.setAgents(0, 0, 2);
+		
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1);
+		
+		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
+
+		
+		assertEquals(2, clh1.getCloudletList().get(1).getVm().getId());
+	}
+	
+	/**
+	 * Test optimizeSchedueling with only 100 * Vm and 40 * tasks.
+	 * 
+	 * @since 1.5.0
+	 */
+	@Test
+	public void testoptimizeSchedueling100VmsAnd40Tasks() {
+		// Setup Cloud Enviroment
+		CloudSimPlus csp1 = new CloudSimPlus();
+		
+		DataCenterUtility dch1 = new DataCenterUtility();
+		VirtualMachineUtility vmh1 = new VirtualMachineUtility();
+		CloudLetUtility clh1 = new CloudLetUtility();
+		DatacenterBrokerSimple dcb1 = new DatacenterBrokerSimple(csp1);
+		
+		dch1.createDatacenter(csp1, 1, 5);
+		
+		for(int i = 0; i<100; i++) {
+			vmh1.addVm(i, 500, 1);
+		}
+		vmh1.addVm(100, 400, 2); //possible best
+		
+		dcb1.submitVmList(vmh1.getVmlist());
+		
+		for(int j = 0; j<50; j++) {
+			clh1.addCloudlet(j, 2, 1);
+		}
+		
+		clh1.addCloudlet(50, 1, 1);  //possible best
+		
+		ParticleSwarm ps = new ParticleSwarm();
+		ps.setAgents(0, 0, 15);
+		
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1);
+		
+		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
+
+		
+		assertEquals(100, clh1.getCloudletList().get(50).getVm().getId());
 	}
 }
