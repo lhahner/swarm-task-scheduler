@@ -31,7 +31,7 @@ public class ParticleSwarm implements Swarm<Particle>{
 			start_x = Math.sqrt(start_x);
 			start_y = Math.sqrt(start_y);
 
-			particles.add((Particle) new ParticleFactory().getParticle(start_x, start_y, Math.random(), Math.random()));
+			particles.add((Particle) new SwarmFactory().getAgent(start_x, start_y, Math.random(), Math.random()));
 		}
 	}
 	
