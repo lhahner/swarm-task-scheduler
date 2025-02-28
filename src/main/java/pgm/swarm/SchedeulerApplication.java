@@ -16,12 +16,13 @@ import pgm.swarm.simulation.CloudLetUtility;
 import pgm.swarm.simulation.DataCenterUtility;
 import pgm.swarm.simulation.VirtualMachineUtility;
 import pgm.swarm.visualization.SwarmVisualizer;
+import pgm.swarm.schedeuler.AntColonyOptimization;
 import pgm.swarm.schedeuler.ParticleSwarm;
 
 public class SchedeulerApplication {
 	
 	public static void main(String[] args) {
-		
+		new AntColonyOptimization().optimize();
 		
 	}
 

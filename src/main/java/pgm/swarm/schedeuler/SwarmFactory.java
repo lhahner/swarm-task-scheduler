@@ -48,6 +48,9 @@ public class SwarmFactory {
 		if(agentType.equals("Particle")) {
 			return new Particle();
 		}
+		else if(agentType.equals("Ant")) {
+			return new Ant();
+		}
 		else {
 			return null;
 		}
