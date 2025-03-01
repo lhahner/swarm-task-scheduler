@@ -1,7 +1,14 @@
 package pgm.swarm.schedeuler;
 
 import java.util.ArrayList;
-
+/**
+ * Swarm of Particles can be used to implement
+ * the Particle Swarm Optimization Algorithm (PSO).
+ * 
+ * TODO Transform setAgents to constructor
+ * @author Lennart Hahner
+ * @version 1.0.0
+ */
 public class ParticleSwarm implements Swarm<Particle>{
 	
 	

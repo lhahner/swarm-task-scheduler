@@ -1,6 +1,9 @@
 package pgm.swarm.schedeuler;
 
 import java.util.ArrayList;
+
+import org.apache.commons.math3.ml.distance.EuclideanDistance;
+
 import java.util.*;
 
 /**
@@ -8,50 +11,80 @@ import java.util.*;
  * colony optimization algorithm.
  * 
  * @author lennart
+ * @version 1.0.0
  */
 public class Ant implements Agent{
-	//stores all the nodes the Ant has visited
-	private Map<Integer, Boolean> visitedNode = new HashMap<>();
 	
-	//current tour of the ant
-	private ArrayList<Integer> tour = new ArrayList<>();
+	//Constant Q
+	private final static double Q = 100;
+	
+	//stores all the nodes the Ant has visited
+	private List<Double> trail;
 	
 	//indicates the node the Ant resides
-	private int position = 0;
+	private int pos;
 	
-	//next postion in the graph
-	private int nextpos = 0;
-	
-	//current pheromone level
-	double pheromoneLevel = 0;
-	
-	//The sum of pheromones of all possible next moves
-	double pheromoneSum = 0;
+	//The rate at which the pheromoneLevel decreases over time
+	double evaporationRate = 0;
 	
 	/**
 	 * Will calculate the probility of the next node to visit
+	 * and then assign the position to that node for the Ant.
 	 * 
-	 * @param pheromoneLevel level of phernome on the graphs edge
-	 * @param distance the distance from current to node
-	 * @param pheronomeSum all possible phernome values and distances summed
-	 * @return
+	 * @param node index so dimension i of adjacent matrix.
+	 * @param node array at dimension i, so values j for i.
 	 */
-	public double calcPheronme(double pheromoneLevel, double distance, double pheronomeSum) {
-		return ((pheromoneLevel*distance))/(pheronomeSum);
+	public void calcPossibleNextVisit(int nodeIndex, double[] node) throws IndexOutOfBoundsException {
+		int nextPos = -1;
+		
+		double[] origin_pos = {nodeIndex, nodeIndex};
+		double[] target_pos = new double[2];
+		double sum = 0;
+		target_pos[0] = nodeIndex;
+		
+		//calc sum for all edges
+		for(int i = 0; i<node.length;i++) {	
+			target_pos[1] = i;
+			double d = new EuclideanDistance().compute(origin_pos, target_pos);
+			sum =+ (node[i] * (1/d));
+		}
+		double probability = 0;
+		
+		//calc probibility, largest probilitly is next path.
+		for(int i = 0; i<node.length;i++) {
+			target_pos[1] = i;
+			double d = new EuclideanDistance().compute(origin_pos, target_pos);
+			if(probability < (node[i] * (1/d)/sum)) {
+				probability = (node[i] * (1/d)/sum);
+				nextPos = i;
+			}
+		}
+		if(nextPos != -1) {
+			this.setPos(nextPos);
+		}
+		else {
+			throw new IndexOutOfBoundsException("next Postion for Ant at node: " + nodeIndex + "not specified, Ant stuck");
+		}
 	}
 	
-	public int getPosition() {
-		return position;
-	}
-	public void setPosition(int position) {
-		this.position = position;
+	/**
+	 * Gets the current poistion of the ant
+	 * in a graph.
+	 * 
+	 * @return A Array of i and j values.
+	 */
+	public int getPos() {
+		return pos;
 	}
 	
-	public int getNextpos() {
-		return nextpos;
+	/**
+	 * This sets/copies the positions array
+	 * with new values.
+	 * 
+	 * @param position The new position array
+	 */
+	public void setPos(int pos) {
+		this.pos = pos;
 	}
-
-	public void setNextpos(int nextpos) {
-		this.nextpos = nextpos;
-	}
+	
 }
