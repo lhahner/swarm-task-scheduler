@@ -2,12 +2,15 @@ package pgm.swarm.schedeuler;
 import java.util.*;
 
 public class AntColonyOptimization {
-	//TODO weighted graph
-	 private double[][] graph = new double[6][6];
+	private double[][] graph;
 	 
-	 
+	 /**
+	  * Implements the ACO for Task-Scheduling using the AntSwarm
+	  * Class in a trotodrial-mesh graph.
+	  */
 	 public void optimize() {
-		 initalizeGraph(5);
+		 initalizeGraph(9, 9);
+		 print_graph(graph);
 	 }
 	 
 	 /**
@@ -16,13 +19,13 @@ public class AntColonyOptimization {
 	  * 
 	  * @param number_nodes the number of nodes in a graph
 	  */
-	 public void initalizeGraph(int number_nodes) {
-		 this.addEgde(0, 1, 0.1);
-		 this.addEgde(1, 3, 0.1);
-		 this.addEgde(3, 5, 0.1);
-		 this.addEgde(0, 2, 0.1);
-		 this.addEgde(2, 4, 0.1);
-		 this.addEgde(4, 5, 0.1);
+	 public void initalizeGraph(int taskScale, int vmScale) {
+		 graph = new double[taskScale][vmScale];
+		 for(int i = 0;i<graph.length;i++) {;
+			 for(int j = 0;j<graph[i].length;j++) {
+				 this.addEgde(i, j, 0.1);
+			 }
+		 }
 	 }
 	 
 	 /**
@@ -34,5 +37,15 @@ public class AntColonyOptimization {
 	  */
 	 public void addEgde(int source, int destination, double weigth) throws NullPointerException{
 		this.graph[source][destination] = weigth;
+	 }
+	 
+	 public void print_graph(double[][] graph) {
+		 for(int i = 0;i<graph.length;i++) {
+			 System.out.print("\n");
+			 for(int j = 0;j<graph[i].length;j++) {
+				 System.out.print(graph[i][j] + ",");
+			 }
+			 
+		 }
 	 }
 }

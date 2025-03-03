@@ -23,7 +23,6 @@ public class SchedeulerApplication {
 	
 	public static void main(String[] args) {
 		new AntColonyOptimization().optimize();
-		
 	}
 
 }
