@@ -83,6 +83,7 @@ public class ParticleSwarmOptimzation {
                 }
                 
                 // Update global best (gbest) and bind the task to the corresponding VM if the makespan is improved.
+                //TODO store gbest and not always evaluate
                 if (this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
                         < this.evaluateSchedueling(swarm.getGbest(), tasklist, vmlist)) {
                     swarm.setGbest(particle.getPos());
