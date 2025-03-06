@@ -45,12 +45,4 @@ public class ParticleTests {
 				r_1, r_2);
 		
 	}
-	
-	/**
-	 * TODO
-	 */
-	@Test
-	public void testCalcPos() {
-		
-	}
 }
