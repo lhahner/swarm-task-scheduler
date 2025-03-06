@@ -1,13 +1,13 @@
 package pgm.swarm.schedeuler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
 
 public class AntOptimizationTests {
 
 	/**
-	 * Asserts
+	 * Asserts that the swarm will find the minimal value in a 
+	 * given 3x3 undirected graph.
 	 */
 	@Test
 	public void optimizeTestPositiveOne() {
@@ -22,7 +22,8 @@ public class AntOptimizationTests {
 	}
 	
 	/**
-	 * Asserts
+	 * Asserts that the swarm will find the minimal value in a 
+	 * given 3x3 undirected graph.
 	 */
 	@Test
 	public void optimizeTestPositiveTwo() {
@@ -37,7 +38,8 @@ public class AntOptimizationTests {
 	}
 	
 	/**
-	 * Asserts
+	 * Asserts that the swarm will find the minimal value in a 
+	 * given 6x3 undirected graph.
 	 */
 	@Test
 	public void optimizeTestPostiveThree() {
@@ -52,5 +54,10 @@ public class AntOptimizationTests {
 				{{0.8, 0.1}, {0.98, 0.1}, {0.3, 0.1}}
 		};
 		assertEquals(0.01, aco.optimize(new AntSwarm(4), graph), 0.01);
+	}
+	
+	@Test
+	public void optimizeScheduling() {
+		
 	}
 }

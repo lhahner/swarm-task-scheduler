@@ -203,7 +203,7 @@ public class ParticleSwarmOptimzationTests {
 
 		broker.submitVmList(test_vms);
 
-		pso.optimizeSchedueling(swarm, test_cloudlets, test_vms, broker);
+		pso.optimizeSchedueling(swarm, test_cloudlets, test_vms, broker, 500);
 
 		assertEquals(test_cls_1.getVm().getId(), test_vm_1.getId());
 	}
@@ -227,7 +227,7 @@ public class ParticleSwarmOptimzationTests {
 		ParticleSwarm ps = new ParticleSwarm();
 		ps.setAgents(0, 0, 2);
 		
-		pso.optimizeSchedueling(ps, clh.getCloudletList(), vmh.getVmlist(), dcb);
+		pso.optimizeSchedueling(ps, clh.getCloudletList(), vmh.getVmlist(), dcb, 500);
 		
 		//makespan = length / (getMips() * getFreePesNumber);
 		//cloudlet 0 & vm 0 -> makespan = 1 / (500 * 1) = 0,002
@@ -268,7 +268,7 @@ public class ParticleSwarmOptimzationTests {
 		ParticleSwarm ps = new ParticleSwarm();
 		ps.setAgents(0, 0, 2);
 		
-		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1);
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 500);
 		
 		//makespan = length / (getMips() * getFreePesNumber);
 		//cloudlet 0 & vm 0 -> makespan = 1 / (500 * 1) = 0,002
@@ -327,7 +327,7 @@ public class ParticleSwarmOptimzationTests {
 		ParticleSwarm ps = new ParticleSwarm();
 		ps.setAgents(0, 0, 2);
 		
-		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1);
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 500);
 		
 		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
 
@@ -336,7 +336,7 @@ public class ParticleSwarmOptimzationTests {
 	}
 	
 	/**
-	 * Test optimizeSchedueling with only 100 * Vm and 40 * tasks.
+	 * Test optimizeSchedueling with only 100 * Vm and 50 * tasks.
 	 * 
 	 * @since 1.5.0
 	 */
@@ -366,13 +366,94 @@ public class ParticleSwarmOptimzationTests {
 		clh1.addCloudlet(50, 1, 1);  //possible best
 		
 		ParticleSwarm ps = new ParticleSwarm();
-		ps.setAgents(0, 0, 15);
+		ps.setAgents(0, 0, 4);
 		
-		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1);
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 500);
 		
 		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
 
-		
 		assertEquals(100, clh1.getCloudletList().get(50).getVm().getId());
+	}
+	
+	/**
+	 * Test optimizeSchedueling with only 500 * Vm and 200 * tasks, with 2000 iterations 
+	 * and 15 agents.
+	 * 
+	 * @since 1.5.0
+	 */
+	@Test
+	public void testoptimizeSchedueling500VmsAnd200Tasks() {
+		// Setup Cloud Enviroment
+		CloudSimPlus csp1 = new CloudSimPlus();
+		
+		DataCenterUtility dch1 = new DataCenterUtility();
+		VirtualMachineUtility vmh1 = new VirtualMachineUtility();
+		CloudLetUtility clh1 = new CloudLetUtility();
+		DatacenterBrokerSimple dcb1 = new DatacenterBrokerSimple(csp1);
+		
+		dch1.createDatacenter(csp1, 1, 5);
+		
+		for(int i = 0; i<500; i++) {
+			vmh1.addVm(i, 500, 1);
+		}
+		vmh1.addVm(500, 400, 2); //possible best
+		
+		dcb1.submitVmList(vmh1.getVmlist());
+		
+		for(int j = 0; j<200; j++) {
+			clh1.addCloudlet(j, 2, 1);
+		}
+		
+		clh1.addCloudlet(200, 1, 1);  //possible best
+		
+		ParticleSwarm ps = new ParticleSwarm();
+		ps.setAgents(0, 0, 16);
+		
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 2000);
+		
+		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
+
+		assertEquals(500, clh1.getCloudletList().get(200).getVm().getId());
+	}
+	
+	/**
+	 * Test optimizeSchedueling with only 1000 * Vm and 400 * tasks, with 2000 iterations 
+	 * and 16 agents.
+	 * 
+	 * @since 1.5.0
+	 */
+	@Test
+	public void testoptimizeSchedueling1000VmsAnd400Tasks() {
+		// Setup Cloud Enviroment
+		CloudSimPlus csp1 = new CloudSimPlus();
+		
+		DataCenterUtility dch1 = new DataCenterUtility();
+		VirtualMachineUtility vmh1 = new VirtualMachineUtility();
+		CloudLetUtility clh1 = new CloudLetUtility();
+		DatacenterBrokerSimple dcb1 = new DatacenterBrokerSimple(csp1);
+		
+		dch1.createDatacenter(csp1, 1, 5);
+		
+		for(int i = 0; i<1000; i++) {
+			vmh1.addVm(i, 500, 1);
+		}
+		vmh1.addVm(1000, 400, 2); //possible best
+		
+		dcb1.submitVmList(vmh1.getVmlist());
+		
+		for(int j = 0; j<400; j++) {
+			clh1.addCloudlet(j, 2, 1);
+		}
+		
+		clh1.addCloudlet(400, 1, 1);  //possible best
+		
+		ParticleSwarm ps = new ParticleSwarm();
+		ps.setAgents(0, 0, 64);
+		
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 8000);
+		
+		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
+
+		assertEquals(1000, clh1.getCloudletList().get(400).getVm().getId());
 	}
 }

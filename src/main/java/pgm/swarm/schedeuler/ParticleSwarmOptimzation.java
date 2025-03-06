@@ -58,18 +58,19 @@ public class ParticleSwarmOptimzation {
     /**
      * Optimizes task scheduling by minimizing the makespan (total execution time) for tasks on available VMs.
      *
-     * @since 1.5.0 binds Task to VM only when the gbest is found.
+     * @since 1.6.0 adds iteration parameter
      * @param swarm The swarm used for optimization.
      * @param tasklist The list of tasks in the simulation.
      * @param vmlist The list of virtual machines (VMs) in the simulation.
      * @param broker The broker responsible for assigning tasks to VMs.
-     */
-    public void optimizeSchedueling(ParticleSwarm swarm, ArrayList<CloudletSimple> tasklist, ArrayList<Vm> vmlist, DatacenterBrokerSimple broker) {
+     * @param n number of iterations performed, needed for scalability
+     */   
+    public void optimizeSchedueling(ParticleSwarm swarm, ArrayList<CloudletSimple> tasklist, ArrayList<Vm> vmlist, DatacenterBrokerSimple broker, int n) {
         
         swarm.setAgents(0, 0, tasklist.size());
         ArrayList<Particle> particles = swarm.getAgents();
         
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < n; i++) {
             
             for (Particle particle : particles) {
                 

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 public class ParticleTests {
 	
 	Particle p;
-	
+
 	@BeforeEach
 	public void init() {
 		p = new Particle();
