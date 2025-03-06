@@ -366,9 +366,9 @@ public class ParticleSwarmOptimzationTests {
 		clh1.addCloudlet(50, 1, 1);  //possible best
 		
 		ParticleSwarm ps = new ParticleSwarm();
-		ps.setAgents(0, 0, 4);
+		ps.setAgents(0, 0, 8);
 		
-		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 500);
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 1000);
 		
 		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
 
@@ -407,9 +407,9 @@ public class ParticleSwarmOptimzationTests {
 		clh1.addCloudlet(200, 1, 1);  //possible best
 		
 		ParticleSwarm ps = new ParticleSwarm();
-		ps.setAgents(0, 0, 16);
+		ps.setAgents(0, 0, 32);
 		
-		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 2000);
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 4000);
 		
 		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
 

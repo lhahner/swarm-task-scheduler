@@ -24,30 +24,29 @@ public class AntColonyOptimization {
 	  * @param n number of iterations
 	  */
 	 public double optimizeScheduling(AntSwarm ants, double[][][] graph, ArrayList<Vm> vms, ArrayList<CloudletSimple> tasks, DatacenterBrokerSimple broker, int n) {
-		//start position of ant
-		int i = 0,j = 0;
 		
-		//current edge the ant is going
-		ArrayList<Integer> edge = new ArrayList<Integer>();
-		edge.add(0);
-		edge.add(0);
+		int i = 0,j = 0;
 		
 		for(int k=0;k<n;k++) {
 		 for(Ant ant : ants.getAgents()) {
+			
+			 ArrayList<Integer> edge = new ArrayList<Integer>();
+			 edge.add(0);
+			 edge.add(0);
 			  do {
-				  //adds current edge the ant goes to trail
-				  ant.addToTrail(edge.get(0), edge.get(1));
-				  
+				 //adds current edge the ant goes to trail
+				 ant.addToTrail(edge.get(0), edge.get(1));
+				 
+				//Set edge values
+				 int[] taskVMcombination = {edge.get(0), edge.get(1)};
+				 graph[edge.get(0)][edge.get(1)][0] = this.evaluateSchedueling(taskVMcombination, tasks, vms);
+				 graph[edge.get(0)][edge.get(1)][1] = ant.updatePheronome(graph[i][j][1], 100);
+				 
 				 ant.calcPossibleNextVisit(i, graph[i]);
 				 
-				 //Set edge values
-				 graph[i][ant.getPos()][0] = this.evaluateSchedueling(graph[i][ant.getPos()], tasks, vms);
-				 graph[i][ant.getPos()][1] = ant.updatePheronome(graph[i][j][1], 2);
-				 
-				 
-				 if(ants.getGbest() > graph[i][ant.getPos()][0]) {
-					 broker.bindCloudletToVm(tasks.get(i), vms.get(ant.getPos()));
-					 ants.setGbest(graph[i][ant.getPos()][0]);
+				 if(ants.getGbest() > graph[edge.get(0)][edge.get(1)][0]) {
+					 broker.bindCloudletToVm(tasks.get(edge.get(0)), vms.get(edge.get(1)));
+					 ants.setGbest(graph[edge.get(0)][edge.get(1)][0]);
 				 }
 				 
 				 //change current path to future path of ant
@@ -56,7 +55,7 @@ public class AntColonyOptimization {
 				 
 				 //move the ant
 				 i = ant.getPos(); 
-				 
+			
 			 } while(!ant.getTrail().contains(edge));
 			 ant.clearTrail();
 		 }
@@ -115,10 +114,10 @@ public class AntColonyOptimization {
      * @param vms The list of available VMs.
      * @return The calculated makespan value (lower is better). Returns a high default value if the assignment is invalid.
      */
-    public double evaluateSchedueling(double[] pos, ArrayList<CloudletSimple> tasks, ArrayList<Vm> vms) {
+    public double evaluateSchedueling(int[] pos, ArrayList<CloudletSimple> tasks, ArrayList<Vm> vms) {
         
-        Vm vm = vms.get((int)pos[0]);
-        Cloudlet task = tasks.get((int)pos[1]);
+        Vm vm = vms.get(pos[0]);
+        Cloudlet task = tasks.get(pos[1]);
         double makespan = 0;
         
         // Compute makespan if the VM can execute the task.
