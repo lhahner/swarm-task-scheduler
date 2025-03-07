@@ -88,6 +88,27 @@ public class Ant implements Agent{
 	}
 	
 	/**
+	 * This will return a new Pheronome value which can be assigned
+	 * to a path. It will ensure that a ant does not traverse multiple
+	 * paths twice since value will increase whenever the ant has
+	 * vistied.
+	 * 
+	 * @verison 1.0.1
+	 * @param phernomeValue The phernome of the visited edge 
+	 * @param Q constant Q to scale the evaporation rate
+	 * @return the new phernome value
+	 */
+	public double updatePheronome(double phernomeValue, double Q, double[][][] graph) {
+		double trail_length = 1;
+		
+		if(!trail.isEmpty()) {
+			for(ArrayList<Integer> p : this.trail)
+				trail_length += graph[p.get(0)][p.get(1)][1];
+		}
+		return (1-evaporationRate)*phernomeValue+(Q/trail_length);
+	}
+	
+	/**
 	 * Gets the current poistion of the ant
 	 * in a graph.
 	 * 

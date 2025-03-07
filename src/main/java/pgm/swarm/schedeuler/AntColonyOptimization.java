@@ -40,7 +40,7 @@ public class AntColonyOptimization {
 				//Set edge values
 				 int[] taskVMcombination = {edge.get(0), edge.get(1)};
 				 graph[edge.get(0)][edge.get(1)][0] = this.evaluateSchedueling(taskVMcombination, tasks, vms);
-				 graph[edge.get(0)][edge.get(1)][1] = ant.updatePheronome(graph[i][j][1], 100);
+				 graph[edge.get(0)][edge.get(1)][1] = ant.updatePheronome(graph[i][j][1], 100, graph);
 				 
 				 ant.calcPossibleNextVisit(i, graph[i]);
 				 
