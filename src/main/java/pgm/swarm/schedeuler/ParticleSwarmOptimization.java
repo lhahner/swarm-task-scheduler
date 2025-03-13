@@ -2,11 +2,14 @@ package pgm.swarm.schedeuler;
 
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.cloudsimplus.brokers.DatacenterBrokerSimple;
 import org.cloudsimplus.cloudlets.Cloudlet;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
+import org.jfree.data.gantt.Task;
 
 import pgm.swarm.visualization.SwarmVisualizer;
 
@@ -18,7 +21,7 @@ import pgm.swarm.visualization.SwarmVisualizer;
  * @version 1.5.0
  * @author lennart.hahner 
  */
-public class ParticleSwarmOptimzation {
+public class ParticleSwarmOptimization {
     
     /**
      * Optimizes a given swarm starting from a specified position over a defined number of iterations.
@@ -66,9 +69,19 @@ public class ParticleSwarmOptimzation {
      * @param n number of iterations performed, needed for scalability
      */   
     public void optimizeSchedueling(ParticleSwarm swarm, ArrayList<CloudletSimple> tasklist, ArrayList<Vm> vmlist, DatacenterBrokerSimple broker, int n) {
-        
+    	SwarmVisualizer sv = new SwarmVisualizer();
+		sv.buildChart("Particle Swarm Optimization", "Task", "VM", tasklist.size() > vmlist.size() ? tasklist.size()+2 : vmlist.size()+2);
+		
         swarm.setAgents(0, 0, tasklist.size());
         ArrayList<Particle> particles = swarm.getAgents();
+        
+        int k = 0;
+        for(Particle particle : particles) {
+
+        	sv.addBubble("Particle " + k, particle.getPos()[0], particle.getPos()[1]);
+        	k++;
+        }
+        sv.display();
         
         for (int i = 0; i < n; i++) {
             
@@ -97,7 +110,18 @@ public class ParticleSwarmOptimzation {
                         vmlist.size() / 100, swarm.getGbest(), Math.random(), Math.random());
                 particle.calcPos(particle.getPos(), particle.getVelo());
             }
-            new SwarmVisualizer().setDataSerieslist(swarm, i);
+            int z = 0;
+            for(Particle particle : particles) {
+            	
+            	try {
+        			Thread.sleep(60);
+        		} catch (InterruptedException e) {
+        			e.printStackTrace();
+        		}
+            	sv.updateBubble("Particle " + z, particle.getPos()[0], particle.getPos()[1]);
+            	z++;
+            }
+            
         }
     }
     

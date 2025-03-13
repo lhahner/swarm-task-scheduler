@@ -32,7 +32,7 @@ import pgm.swarm.simulation.VirtualMachineUtility;
  */
 public class ParticleSwarmOptimzationTests {
 
-	ParticleSwarmOptimzation pso;
+	ParticleSwarmOptimization pso;
 	VirtualMachineUtility vmh;
 	CloudLetUtility clh;
 	CloudSimPlus csp;
@@ -45,7 +45,7 @@ public class ParticleSwarmOptimzationTests {
 	 */
 	@BeforeEach
 	public void runtests() {
-		pso = new ParticleSwarmOptimzation();
+		pso = new ParticleSwarmOptimization();
 		vmh = new VirtualMachineUtility();
 		clh = new CloudLetUtility();
 		dch = new DataCenterUtility();
@@ -61,13 +61,13 @@ public class ParticleSwarmOptimzationTests {
 	 */
 	@Test
 	public void testEvaluateScheduelingPositives() {
-		ParticleSwarmOptimzation pso;
+		ParticleSwarmOptimization pso;
 		VirtualMachineUtility vmh;
 		CloudLetUtility clh;
 		CloudSimPlus csp;
 		DataCenterUtility dch;
 		DatacenterBrokerSimple dcb;
-		pso = new ParticleSwarmOptimzation();
+		pso = new ParticleSwarmOptimization();
 		vmh = new VirtualMachineUtility();
 		clh = new CloudLetUtility();
 		dch = new DataCenterUtility();
@@ -121,7 +121,7 @@ public class ParticleSwarmOptimzationTests {
 	 */
 	@Test
 	public void testEvaluateScheduelingNegatives() {
-		ParticleSwarmOptimzation pso = new ParticleSwarmOptimzation();
+		ParticleSwarmOptimization pso = new ParticleSwarmOptimization();
 		VirtualMachineUtility vmh = new VirtualMachineUtility();
 		CloudLetUtility clh = new CloudLetUtility();
 		CloudSimPlus csp = new CloudSimPlus();

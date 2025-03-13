@@ -1,20 +1,15 @@
 package pgm.swarm.visualization;
 
-import java.util.ArrayList;
+import java.awt.Font;
 
-import javax.swing.JFrame;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XYChart;
+import org.knowm.xchart.XYChartBuilder;
+import org.knowm.xchart.XYSeries;
+import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
+import org.knowm.xchart.style.Styler.LegendPosition;
+import org.knowm.xchart.style.markers.SeriesMarkers;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-
-import pgm.swarm.schedeuler.Particle;
-import pgm.swarm.schedeuler.ParticleSwarm;
-import pgm.swarm.schedeuler.Swarm;
 
 /**
  * This class is responsible for visualizing the Particle Swarm Optimization (PSO) swarm
@@ -22,82 +17,82 @@ import pgm.swarm.schedeuler.Swarm;
  * generating scatter plots, and displaying the results using Java Swing.
  * 
  * @author lennart.hahner
- * @version 1.0.0
+ * @version 2.0.0
  */
 public class SwarmVisualizer {
+	
+	private XYChart chart;
+	private SwingWrapper<XYChart> sw;
+	private XYSeries series;
     
-    private static ArrayList<XYSeries> dataSerieslist = new ArrayList<XYSeries>();
-
-    /**
-     * Sets the list of data series that track the positions of the particles
-     * during each iteration of the swarm optimization process.
-     * 
-     * @param swarm The ParticleSwarm instance representing the current swarm.
-     * @param i The iteration number of the swarm optimization.
-     */
-    public void setDataSerieslist(Swarm<Particle> swarm, int i) {
-        // Limit the number of stored iterations to avoid excessive memory usage
-        if (dataSerieslist.size() > 100) {
-            return;
-        }
-
-        XYSeries series = new XYSeries("Iteration " + i);
-
-        for (Particle particle : swarm.getAgents()) {
-            series.add(particle.getPos()[0], particle.getPos()[1]);
-        }
-        dataSerieslist.add(series);
+	/**
+	 * Builds a basic Bubble chart for visualization of several Algorithms.
+	 * 
+	 * @param title Define the Title of the graph.
+	 * @param XAxisTitle Define which values are mapped on the X-Axis
+	 * @param YAxisTitle Define which values are mapped on the Y-Axis
+	 * @param chartSize Define the max-values for X- and Y-Axis
+	 */
+    public void buildChart(String title, String XAxisTitle, String YAxisTitle, int chartSize) {
+    	// Create Chart
+    	chart = new XYChartBuilder().width(600).height(500).title(title).xAxisTitle(XAxisTitle).yAxisTitle(YAxisTitle).build();
+    	// Customize Chart
+    	this.customizeChart(chartSize);
     }
-
+    
     /**
-     * Retrieves the list of data series, each representing the positions of the particles
-     * during one iteration of the swarm optimization process.
+     * This setup the default propreties for the chart.
      * 
-     * @return The list of XYSeries objects representing the positions of particles over time.
+     * @param chartSize Define the size of the chart so max for X-Axis and Y-Axis
      */
-    public ArrayList<XYSeries> getDataSerieslist() {
-        return this.dataSerieslist;
+    public void customizeChart(int chartSize) {
+    	chart.getStyler().setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Scatter);
+    	chart.getStyler().setChartTitleVisible(true);
+    	chart.getStyler().setLegendPosition(LegendPosition.InsideSW);
+    	chart.getStyler().setMarkerSize(16);
+    	chart.getStyler().setLegendVisible(false);
+    	chart.getStyler().setXAxisMin(0.0);  // X-Axis Start
+    	chart.getStyler().setXAxisMax((double)chartSize); // X-Axis End
+    	chart.getStyler().setYAxisMax(0.0); // X-Axis End
+    	chart.getStyler().setYAxisMax((double)chartSize); // X-Axis End
+    	chart.getStyler().setXAxisDecimalPattern("#"); // Integer formatting for X-axis
+    	chart.getStyler().setYAxisDecimalPattern("#"); // Integer formatting for Y-axis
+    	chart.getStyler().setPlotGridLinesVisible(true);   // Enable grid
+    	chart.getStyler().setChartBackgroundColor(java.awt.Color.WHITE);
+    	chart.getStyler().setXAxisTickMarkSpacingHint(chartSize);
+    	chart.getStyler().setYAxisTickMarkSpacingHint(chartSize);
+    	chart.getStyler().setXAxisTicksVisible(false);
     }
-
+   
     /**
-     * Creates a scatter plot chart to visualize the positions of the particles
-     * during a specific iteration of the Particle Swarm Optimization.
+     * Adds a new bubble to the chart.
      * 
-     * @param title The title of the chart.
-     * @param serieslist The list of XYSeries objects containing the data to be plotted.
-     * @param xAxisName The label for the x-axis.
-     * @param yAxisName The label for the y-axis.
-     * @return A JFreeChart object representing the scatter plot.
+     * @param name Define a name for the bubble, should be unqiue
+     * @param posX, define the Positon X for the Bubble.
+     * @param posY, define the Postion Y for the Bubble.
      */
-    public JFreeChart setScatterChartForPSO(String title, ArrayList<XYSeries> serieslist, String xAxisName, String yAxisName) {
-
-        XYSeriesCollection dataset = new XYSeriesCollection();
-
-        for (XYSeries series : serieslist) {
-            dataset.addSeries(series);
-        }
-
-        return ChartFactory.createScatterPlot(title, xAxisName, yAxisName, dataset);
+    public void addBubble(String name, double posX, double posY) {
+    	series = chart.addSeries(name, new double[]{posX, posX}, new double[]{posY, posY});
+    	series.setMarker(SeriesMarkers.CIRCLE);
     }
-
+    
     /**
-     * Sets up a JFrame to display the scatter plot chart.
+     * Updates the values for the bubble to compute.
      * 
-     * @return A JFrame containing the chart.
-     * @throws NullPointerException If the chart is null.
+     * @param name Unique identfier for the bubble
+     * @param posX The new position of the bubble at the X-Axis
+     * @param posY The new postion of the bubble at the Y-Axis
      */
-    public JFrame setupFrame() throws NullPointerException {
-
-        JFreeChart chart = setScatterChartForPSO("PSO", this.getDataSerieslist(), "VM", "Task");
-
-        ChartPanel chartPanel = new ChartPanel(chart);
-        JFrame frame = new JFrame();
-        frame.setSize(800, 600);
-        frame.setContentPane(chartPanel);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-
-        return frame;
+    public void updateBubble(String name, double posX, double posY) {
+    	chart.updateXYSeries(name, new double[]{posX, posX}, new double[]{posY, posY}, null);
+        sw.repaintChart();
+    }
+    
+    /**
+     * Display the Graph and Frame.
+     */
+    public void display() {
+    	sw = new SwingWrapper<XYChart>(chart);
+    	sw.displayChart();
     }
 }
