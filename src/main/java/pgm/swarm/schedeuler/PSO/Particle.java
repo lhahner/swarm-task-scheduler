@@ -1,8 +1,11 @@
-package pgm.swarm.schedeuler;
+package pgm.swarm.schedeuler.PSO;
+
+import pgm.swarm.schedeuler.Agent;
 
 /** 
  * Particle which is part of the Particle-Swarm-Optimization 
- * algorithm.
+ * algorithm. This version of the Particle implements a two-dimensional
+ * Array for representing the position of the Ant.
  * 
  * 
  * @version 1.0.0

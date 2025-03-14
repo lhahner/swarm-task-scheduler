@@ -1,2 +1,9 @@
 .vscode
 /target/
+.DS_Store
+.classpath
+.project
+.settings
+mvnw
+mvnw.cmd
+./target/*

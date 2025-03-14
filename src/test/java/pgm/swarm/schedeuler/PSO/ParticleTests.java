@@ -1,8 +1,11 @@
-package pgm.swarm.schedeuler;
+package pgm.swarm.schedeuler.PSO;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+
+import pgm.swarm.schedeuler.PSO.Particle;
+
 import org.junit.jupiter.api.BeforeEach;
 
 /**

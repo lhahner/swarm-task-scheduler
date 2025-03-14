@@ -1,5 +1,8 @@
 package pgm.swarm.schedeuler;
 
+import pgm.swarm.schedeuler.ACO.Ant;
+import pgm.swarm.schedeuler.PSO.Particle;
+
 /**
  * This factory will generate the Agents necassry for a
  * Swarm. So whenever a swarm is made up, this method

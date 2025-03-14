@@ -19,7 +19,7 @@ import org.knowm.xchart.style.markers.SeriesMarkers;
  * @author lennart.hahner
  * @version 2.0.0
  */
-public class SwarmVisualizer {
+public class BubbleChart {
 	
 	private XYChart chart;
 	private SwingWrapper<XYChart> sw;
@@ -33,13 +33,13 @@ public class SwarmVisualizer {
 	 * @param YAxisTitle Define which values are mapped on the Y-Axis
 	 * @param chartSize Define the max-values for X- and Y-Axis
 	 */
-    public void buildChart(String title, String XAxisTitle, String YAxisTitle, int chartSize) {
-    	// Create Chart
+	public BubbleChart(String title, String XAxisTitle, String YAxisTitle, int chartSize) {
+		// Create Chart
     	chart = new XYChartBuilder().width(600).height(500).title(title).xAxisTitle(XAxisTitle).yAxisTitle(YAxisTitle).build();
     	// Customize Chart
     	this.customizeChart(chartSize);
-    }
-    
+	}
+	
     /**
      * This setup the default propreties for the chart.
      * 

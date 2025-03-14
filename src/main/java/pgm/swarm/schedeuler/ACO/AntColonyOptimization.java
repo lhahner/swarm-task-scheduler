@@ -1,4 +1,4 @@
-package pgm.swarm.schedeuler;
+package pgm.swarm.schedeuler.ACO;
 import java.util.*;
 
 import org.cloudsimplus.brokers.DatacenterBrokerSimple;
@@ -34,10 +34,8 @@ public class AntColonyOptimization {
 			 edge.add(0);
 			 edge.add(0);
 			  do {
-				 //adds current edge the ant goes to trail
 				 ant.addToTrail(edge.get(0), edge.get(1));
 				 
-				//Set edge values
 				 int[] taskVMcombination = {edge.get(0), edge.get(1)};
 				 graph[edge.get(0)][edge.get(1)][0] = this.evaluateSchedueling(taskVMcombination, tasks, vms);
 				 graph[edge.get(0)][edge.get(1)][1] = ant.updatePheronome(graph[i][j][1], 100, graph);
@@ -48,12 +46,9 @@ public class AntColonyOptimization {
 					 broker.bindCloudletToVm(tasks.get(edge.get(0)), vms.get(edge.get(1)));
 					 ants.setGbest(graph[edge.get(0)][edge.get(1)][0]);
 				 }
-				 
-				 //change current path to future path of ant
+
 				 edge.set(0, i);
 				 edge.set(1, ant.getPos());
-				 
-				 //move the ant
 				 i = ant.getPos(); 
 			
 			 } while(!ant.getTrail().contains(edge));
@@ -71,10 +66,8 @@ public class AntColonyOptimization {
 	  * @param graph a graph to optimize
 	  */
 	 public double optimize(AntSwarm ants, double[][][] graph) {
-		//start position of ant
 		int i = 0,j = 0;
 		
-		//current edge the ant is going
 		ArrayList<Integer> edge = new ArrayList<Integer>();
 		edge.add(0);
 		edge.add(0);
@@ -82,7 +75,6 @@ public class AntColonyOptimization {
 		for(int k=0;k<200;k++) {
 		 for(Ant ant : ants.getAgents()) {
 			  do {
-				  //adds current edge the ant goes to trail
 				  ant.addToTrail(edge.get(0), edge.get(1));
 				  
 				 ant.calcPossibleNextVisit(i, graph[i]);
@@ -92,12 +84,10 @@ public class AntColonyOptimization {
 					 ants.setGbest(graph[i][ant.getPos()][0]);
 				 }
 				 
-				 //change current path to future path of ant
 				 edge.set(0, i);
 				 edge.set(1, ant.getPos());
-				 
-				 //move the ant
 				 i = ant.getPos(); 
+				 
 			 } while(!ant.getTrail().contains(edge));
 			 ant.clearTrail();
 		 }
@@ -120,11 +110,10 @@ public class AntColonyOptimization {
         Cloudlet task = tasks.get(pos[1]);
         double makespan = 0;
         
-        // Compute makespan if the VM can execute the task.
         if (vm.isSuitableForCloudlet(task)) {
             makespan = task.getLength() / (vm.getMips() * vm.getFreePesNumber());
         } else {
-            return 10.0; // Default high value if the VM is unsuitable.
+            return 10.0;
         }
         return makespan;
 	    }

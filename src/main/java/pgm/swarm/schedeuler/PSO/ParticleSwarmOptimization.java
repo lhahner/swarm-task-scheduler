@@ -1,4 +1,4 @@
-package pgm.swarm.schedeuler;
+package pgm.swarm.schedeuler.PSO;
 
 import java.util.ArrayList;
 
@@ -11,20 +11,24 @@ import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 import org.jfree.data.gantt.Task;
 
-import pgm.swarm.visualization.SwarmVisualizer;
+import pgm.swarm.visualization.BubbleChart;
+import pgm.swarm.visualization.VisualizationStrategy;
 
 /**
  * Class for performing Particle Swarm Optimization (PSO) on different problems.
+ * This class makes use of the Particle Swarm and performs domain specfic or
+ * Domain independed optimization.
  * 
- * Point of Interest -> Scaleability
- * 
- * @version 1.5.0
+ * @version 1.7.0
  * @author lennart.hahner 
  */
 public class ParticleSwarmOptimization {
+	
+	private VisualizationStrategy visualizationStrategy;
     
     /**
      * Optimizes a given swarm starting from a specified position over a defined number of iterations.
+     * This is domain independed.
      * 
      * @param swarm The swarm to be optimized.
      * @param startpos_x The initial x-coordinate of the swarm.
@@ -33,24 +37,21 @@ public class ParticleSwarmOptimization {
      */
     public void optimize(ParticleSwarm swarm, double startpos_x, double startpos_y, int swarmsize) {
         
-        swarm.setAgents(startpos_x, startpos_y, swarmsize);
+        swarm = new ParticleSwarm(startpos_x, startpos_y, swarmsize);
         
         for (int i = 0; i < swarmsize; i++) {
             
             for (Particle particle : swarm.getAgents()) {
                 
-                // Update personal best (pbest) position if current position is better.
                 if (particle.evaluate(particle.getPos()) < particle.evaluate(particle.getPbest())) {
                     double[] pbest = particle.getPos();
                     particle.setPbest(pbest);
                 }
                 
-                // Update global best (gbest) position if current position is better. 
                 if (particle.evaluate(particle.getPos()) < particle.evaluate(swarm.getGbest())) {
                     swarm.setGbest(particle.getPos());
                 }
                 
-                // Update velocity and position of the particle.
                 particle.calcVelo(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGbest(),
                         Math.random(), Math.random());
                 particle.calcPos(particle.getPos(), particle.getVelo());
@@ -60,68 +61,47 @@ public class ParticleSwarmOptimization {
     
     /**
      * Optimizes task scheduling by minimizing the makespan (total execution time) for tasks on available VMs.
+     * This is domain depended and specfically used for Task-Scheduling in Cloud Computing.
      *
-     * @since 1.6.0 adds iteration parameter
      * @param swarm The swarm used for optimization.
      * @param tasklist The list of tasks in the simulation.
      * @param vmlist The list of virtual machines (VMs) in the simulation.
      * @param broker The broker responsible for assigning tasks to VMs.
-     * @param n number of iterations performed, needed for scalability
+     * @param n number of iterations performed, needed for scalability.
+     * @param visualization defines visualization strategy to perform.
      */   
-    public void optimizeSchedueling(ParticleSwarm swarm, ArrayList<CloudletSimple> tasklist, ArrayList<Vm> vmlist, DatacenterBrokerSimple broker, int n) {
-    	SwarmVisualizer sv = new SwarmVisualizer();
-		sv.buildChart("Particle Swarm Optimization", "Task", "VM", tasklist.size() > vmlist.size() ? tasklist.size()+2 : vmlist.size()+2);
-		
-        swarm.setAgents(0, 0, tasklist.size());
+    public void optimizeSchedueling(ParticleSwarm swarm, ArrayList<CloudletSimple> tasklist, ArrayList<Vm> vmlist, DatacenterBrokerSimple broker, int n, VisualizationStrategy visualization) {
+	
+		swarm = new ParticleSwarm(0, 0, tasklist.size());
         ArrayList<Particle> particles = swarm.getAgents();
         
-        int k = 0;
-        for(Particle particle : particles) {
-
-        	sv.addBubble("Particle " + k, particle.getPos()[0], particle.getPos()[1]);
-        	k++;
-        }
-        sv.display();
+        this.setAndGetVisualizationStrategy(visualization)
+        	.visualize(particles, 
+        				tasklist.size() > vmlist.size()? tasklist.size() : vmlist.size());
         
         for (int i = 0; i < n; i++) {
-            
             for (Particle particle : particles) {
                 
             	resetParticlesOutOfRange(particle, vmlist, tasklist);
                 
-                // Update personal best (pbest) if the new position results in a lower makespan.
                 if (this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
                         < this.evaluateSchedueling(particle.getPbest(), tasklist, vmlist)) {
                     double[] pbest = particle.getPos();
                     particle.setPbest(pbest);
                 }
                 
-                // Update global best (gbest) and bind the task to the corresponding VM if the makespan is improved.
-                //TODO store gbest and not always evaluate
                 if (this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
                         < this.evaluateSchedueling(swarm.getGbest(), tasklist, vmlist)) {
                     swarm.setGbest(particle.getPos());
                     broker.bindCloudletToVm(tasklist.get(Math.abs((int) Math.round(particle.getPos()[1]))), 
                             vmlist.get(Math.abs((int) Math.round(particle.getPos()[0]))));
                 }
-                
-                // Update velocity and position of the particle.
+               
                 particle.calcVelo(particle.getVelo(), tasklist.size() / 100, particle.getPbest(), particle.getPos(),
                         vmlist.size() / 100, swarm.getGbest(), Math.random(), Math.random());
                 particle.calcPos(particle.getPos(), particle.getVelo());
             }
-            int z = 0;
-            for(Particle particle : particles) {
-            	
-            	try {
-        			Thread.sleep(60);
-        		} catch (InterruptedException e) {
-        			e.printStackTrace();
-        		}
-            	sv.updateBubble("Particle " + z, particle.getPos()[0], particle.getPos()[1]);
-            	z++;
-            }
-            
+            this.visualizationStrategy.updateAndVisualize(particles);
         }
     }
     
@@ -137,18 +117,17 @@ public class ParticleSwarmOptimization {
     public double evaluateSchedueling(double[] pos, ArrayList<CloudletSimple> tasks, ArrayList<Vm> vms) {
         
         if (Math.abs((int) Math.round(pos[0])) >= vms.size() || Math.abs((int) Math.round(pos[1])) >= tasks.size()) {
-            return 10.0; // Default high value for invalid assignments.
+            return 10.0;
         }
         
         Vm vm = vms.get(Math.abs((int) Math.round(pos[0])));
         Cloudlet task = tasks.get(Math.abs((int) Math.round(pos[1])));
         double makespan = 0;
         
-        // Compute makespan if the VM can execute the task.
         if (vm.isSuitableForCloudlet(task)) {
             makespan = task.getLength() / (vm.getMips() * vm.getFreePesNumber());
         } else {
-            return 10.0; // Default high value if the VM is unsuitable.
+            return 10.0;
         }
         return makespan;
     }
@@ -172,5 +151,16 @@ public class ParticleSwarmOptimization {
         if (particle.getPos()[1] >= tasklist.size()) {
             particle.setPosY(Math.random() * scalingFactor);
         }
+    }
+    
+    /**
+     * Should provide and assign a Visualiation strategy specified for the PSO algorithm.
+     * 
+     * @param visualizationStrategy the strategy to be peformed for the current use-case
+     * @return the strategy to be peformed for the current use-case
+     */
+    private VisualizationStrategy setAndGetVisualizationStrategy(VisualizationStrategy visualizationStrategy) {
+    	this.visualizationStrategy = visualizationStrategy;
+    	return this.visualizationStrategy;
     }
 }

@@ -1,9 +1,11 @@
-package pgm.swarm.schedeuler;
+package pgm.swarm.schedeuler.ACO;
 
 import static org.junit.Assert.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import pgm.swarm.schedeuler.ACO.Ant;
 
 /**
  * Test-Class for the Ant class

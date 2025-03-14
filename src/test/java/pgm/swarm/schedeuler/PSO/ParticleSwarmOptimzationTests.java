@@ -1,4 +1,4 @@
-package pgm.swarm.schedeuler;
+package pgm.swarm.schedeuler.PSO;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,10 +20,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import pgm.swarm.schedeuler.PSO.ParticleSwarm;
+import pgm.swarm.schedeuler.PSO.ParticleSwarmOptimization;
 import pgm.swarm.simulation.CloudLetUtility;
 import pgm.swarm.simulation.DataCenterUtility;
 import pgm.swarm.simulation.DataCenterUtility;
 import pgm.swarm.simulation.VirtualMachineUtility;
+import pgm.swarm.visualization.NoVisualizationStrategy;
+import pgm.swarm.visualization.VisualizationStrategy;
 
 /**
  * Tests for the ParticleSwarmOptimization class.
@@ -176,9 +180,8 @@ public class ParticleSwarmOptimzationTests {
 			vmh.addVm(i, 30, 5);
 		}
 		clh.generateCloudlets(2, 2, 20);
-		ParticleSwarm swarm = new ParticleSwarm();
-		swarm.setAgents(0, 0, 3);
-
+		ParticleSwarm swarm = new ParticleSwarm(0, 0, 3);
+		
 		CloudSimPlus csp = new CloudSimPlus();
 		DatacenterSimple dcs = new DatacenterSimple(csp, new VmAllocationPolicySimple());
 		DatacenterBrokerSimple broker = new DatacenterBrokerSimple(csp);
@@ -203,7 +206,7 @@ public class ParticleSwarmOptimzationTests {
 
 		broker.submitVmList(test_vms);
 
-		pso.optimizeSchedueling(swarm, test_cloudlets, test_vms, broker, 500);
+		pso.optimizeSchedueling(swarm, test_cloudlets, test_vms, broker, 500, new NoVisualizationStrategy());
 
 		assertEquals(test_cls_1.getVm().getId(), test_vm_1.getId());
 	}
@@ -224,10 +227,9 @@ public class ParticleSwarmOptimzationTests {
 		clh.addCloudlet(0, 1, 1);
 		clh.addCloudlet(1, 2, 1);
 		
-		ParticleSwarm ps = new ParticleSwarm();
-		ps.setAgents(0, 0, 2);
+		ParticleSwarm ps = new ParticleSwarm(0, 0, 2);
 		
-		pso.optimizeSchedueling(ps, clh.getCloudletList(), vmh.getVmlist(), dcb, 500);
+		pso.optimizeSchedueling(ps, clh.getCloudletList(), vmh.getVmlist(), dcb, 500, new NoVisualizationStrategy());
 		
 		//makespan = length / (getMips() * getFreePesNumber);
 		//cloudlet 0 & vm 0 -> makespan = 1 / (500 * 1) = 0,002
@@ -265,10 +267,9 @@ public class ParticleSwarmOptimzationTests {
 		clh1.addCloudlet(0, 1, 1);
 		clh1.addCloudlet(1, 2, 1);
 		
-		ParticleSwarm ps = new ParticleSwarm();
-		ps.setAgents(0, 0, 2);
+		ParticleSwarm ps = new ParticleSwarm(0, 0, 2);
 		
-		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 500);
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 500, new NoVisualizationStrategy());
 		
 		//makespan = length / (getMips() * getFreePesNumber);
 		//cloudlet 0 & vm 0 -> makespan = 1 / (500 * 1) = 0,002
@@ -324,10 +325,9 @@ public class ParticleSwarmOptimzationTests {
 		clh1.addCloudlet(6, 2, 1);
 		clh1.addCloudlet(7, 2, 1);
 		
-		ParticleSwarm ps = new ParticleSwarm();
-		ps.setAgents(0, 0, 2);
+		ParticleSwarm ps = new ParticleSwarm(0, 0, 2);
 		
-		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 500);
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 500, new NoVisualizationStrategy());
 		
 		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
 
@@ -365,10 +365,9 @@ public class ParticleSwarmOptimzationTests {
 		
 		clh1.addCloudlet(50, 1, 1);  //possible best
 		
-		ParticleSwarm ps = new ParticleSwarm();
-		ps.setAgents(0, 0, 8);
-		
-		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 1000);
+		ParticleSwarm ps = new ParticleSwarm(0, 0, 8);
+
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 1000, new NoVisualizationStrategy());
 		
 		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
 
@@ -406,10 +405,9 @@ public class ParticleSwarmOptimzationTests {
 		
 		clh1.addCloudlet(200, 1, 1);  //possible best
 		
-		ParticleSwarm ps = new ParticleSwarm();
-		ps.setAgents(0, 0, 32);
+		ParticleSwarm ps = new ParticleSwarm(0, 0, 32);
 		
-		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 4000);
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 4000, new NoVisualizationStrategy());
 		
 		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
 
@@ -447,10 +445,9 @@ public class ParticleSwarmOptimzationTests {
 		
 		clh1.addCloudlet(400, 1, 1);  //possible best
 		
-		ParticleSwarm ps = new ParticleSwarm();
-		ps.setAgents(0, 0, 64);
+		ParticleSwarm ps = new ParticleSwarm(0, 0, 64);
 		
-		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 8000);
+		pso.optimizeSchedueling(ps, clh1.getCloudletList(), vmh1.getVmlist(), dcb1, 8000, new NoVisualizationStrategy());
 		
 		//cloudlet 1 & vm 2 -> makespan = 1 / (400 * 2) = 0,00125 x
 

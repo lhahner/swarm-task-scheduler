@@ -1,6 +1,9 @@
-package pgm.swarm.schedeuler;
+package pgm.swarm.schedeuler.PSO;
 
 import java.util.ArrayList;
+
+import pgm.swarm.schedeuler.Swarm;
+import pgm.swarm.schedeuler.SwarmFactory;
 /**
  * Swarm of Particles can be used to implement
  * the Particle Swarm Optimization Algorithm (PSO).
@@ -21,7 +24,7 @@ public class ParticleSwarm implements Swarm<Particle>{
 	 * This Array stores all the particles of the swarm.
 	 */
 	private ArrayList<Particle> particles;
-
+	
 	/**
 	 * Sets the swarm of particles 
 	 * 
@@ -30,8 +33,7 @@ public class ParticleSwarm implements Swarm<Particle>{
 	 * @param start_y y position to start.
 	 * @param size the size of the array.
 	 */
-	public void setAgents(double start_x, double start_y, int size) {
-
+	public ParticleSwarm(double start_x, double start_y, int size) {
 		particles = new ArrayList<Particle>();
 		for (int i = 0; size > i; i++) {
 
@@ -41,6 +43,7 @@ public class ParticleSwarm implements Swarm<Particle>{
 			particles.add((Particle) new SwarmFactory().getAgent(start_x, start_y, Math.random(), Math.random()));
 		}
 	}
+
 	
 	/**
 	 * Provides the Particle Swarm.

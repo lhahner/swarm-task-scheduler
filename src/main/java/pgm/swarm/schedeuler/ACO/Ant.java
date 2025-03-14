@@ -1,8 +1,10 @@
-package pgm.swarm.schedeuler;
+package pgm.swarm.schedeuler.ACO;
 
 import java.util.ArrayList;
 
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
+
+import pgm.swarm.schedeuler.Agent;
 
 import java.util.*;
 
@@ -15,13 +17,19 @@ import java.util.*;
  */
 public class Ant implements Agent{
 	
-	//stores all the nodes the Ant has visited
+	/**
+	 * stores all the nodes the Ant has visited
+	 */
 	private List<ArrayList<Integer>> trail = new ArrayList<ArrayList<Integer>>();
 	
-	//indicates the node the Ant resides
+	/**
+	 * indicates the node the Ant resides
+	 */
 	private int pos;
 
-	//The rate at which the pheromoneLevel decreases over time
+	/**
+	 * The rate at which the pheromoneLevel decreases over time
+	 */
 	double evaporationRate = 0.5;
 	
 	/**
@@ -32,18 +40,12 @@ public class Ant implements Agent{
 	 * @param node array at dimension i, so values j for i.
 	 */
 	public void calcPossibleNextVisit(int nodeIndex, double[][] node) throws IndexOutOfBoundsException {
-		//Has the edge via which the ant will travers, defined by the j index of a graph
 		int edge = -1;
-		//
 		double[] possibleEdge = new double[2];
-		
-		double sum = 0;
-		
-		double probability = 0;
-		
+		double sum = 0, probability = 0;
+
 		possibleEdge[0] = nodeIndex;
 		
-		//calc sum for all edges
 		for(int i = 0; i<node.length;i++) {	
 			possibleEdge[1] = i;
 			double d = node[i][0];

@@ -1,6 +1,9 @@
-package pgm.swarm.schedeuler;
+package pgm.swarm.schedeuler.ACO;
 
 import java.util.ArrayList;
+
+import pgm.swarm.schedeuler.Swarm;
+import pgm.swarm.schedeuler.SwarmFactory;
 
 /**
  * Artifical AntSwarm used for cobinatorical problems

@@ -1,4 +1,4 @@
-package pgm.swarm.schedeuler;
+package pgm.swarm.schedeuler.ACO;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,6 +6,8 @@ import org.cloudsimplus.brokers.DatacenterBrokerSimple;
 import org.cloudsimplus.core.CloudSimPlus;
 import org.junit.jupiter.api.Test;
 
+import pgm.swarm.schedeuler.ACO.AntColonyOptimization;
+import pgm.swarm.schedeuler.ACO.AntSwarm;
 import pgm.swarm.simulation.CloudLetUtility;
 import pgm.swarm.simulation.DataCenterUtility;
 import pgm.swarm.simulation.VirtualMachineUtility;
