@@ -1,3 +1,4 @@
+Paper-link: https://www.researchgate.net/publication/392096816_Application_of_Swarm_Intelligence_in_Cloud_Task_Scheduling
 # Swarm Task Scheduler: Project Description
 ## Methods & Technologies
 
