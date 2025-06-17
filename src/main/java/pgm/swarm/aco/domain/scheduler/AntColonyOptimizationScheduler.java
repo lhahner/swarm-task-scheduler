@@ -7,9 +7,9 @@ import org.cloudsimplus.cloudlets.Cloudlet;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 
+import pgm.swarm.Swarm;
 import pgm.swarm.aco.core.Ant;
 import pgm.swarm.aco.core.AntColonyOptimization;
-import pgm.swarm.aco.core.AntSwarm;
 
 public class AntColonyOptimizationScheduler extends AntColonyOptimization{
 
@@ -21,7 +21,7 @@ public class AntColonyOptimizationScheduler extends AntColonyOptimization{
 	  * @param graph a task to vm mapping graph
 	  * @param n number of iterations
 	  */
-	 public double optimizeScheduling(AntSwarm ants, double[][][] graph, ArrayList<Vm> vms, ArrayList<CloudletSimple> tasks, DatacenterBrokerSimple broker, int n) {
+	 public double optimizeScheduling(Swarm<Ant> ants, double[][][] graph, ArrayList<Vm> vms, ArrayList<CloudletSimple> tasks, DatacenterBrokerSimple broker, int n) {
 		
 		int i = 0,j = 0;
 		

@@ -7,8 +7,8 @@ import org.cloudsimplus.cloudlets.Cloudlet;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 
+import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
-import pgm.swarm.pso.core.ParticleSwarm;
 import pgm.swarm.pso.core.ParticleSwarmOptimization;
 import pgm.visualization.VisualizationStrategy;
 
@@ -24,9 +24,9 @@ public class ParticleSwarmOptimizationScheduler extends ParticleSwarmOptimizatio
      * @param n number of iterations performed, needed for scalability.
      * @param visualization defines visualization strategy to perform.
      */   
-    public void optimizeSchedueling(ParticleSwarm swarm, ArrayList<CloudletSimple> tasklist, ArrayList<Vm> vmlist, DatacenterBrokerSimple broker, int n, VisualizationStrategy visualization) {
+    public void optimizeSchedueling(Swarm<Particle> swarm, ArrayList<CloudletSimple> tasklist, ArrayList<Vm> vmlist, DatacenterBrokerSimple broker, int n, VisualizationStrategy visualization) {
 	
-		swarm = new ParticleSwarm(0, 0, tasklist.size());
+		swarm = new Swarm<Particle>(0, 0, tasklist.size(), Particle.class);
         ArrayList<Particle> particles = swarm.getAgents();
         
         super.setAndGetVisualizationStrategy(visualization)
@@ -45,14 +45,14 @@ public class ParticleSwarmOptimizationScheduler extends ParticleSwarmOptimizatio
                 }
                 
                 if (this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
-                        < this.evaluateSchedueling(swarm.getGbest(), tasklist, vmlist)) {
-                    swarm.setGbest(particle.getPos());
+                        < this.evaluateSchedueling(swarm.getGbests(), tasklist, vmlist)) {
+                    swarm.setGbests(particle.getPos());
                     broker.bindCloudletToVm(tasklist.get(Math.abs((int) Math.round(particle.getPos()[1]))), 
                             vmlist.get(Math.abs((int) Math.round(particle.getPos()[0]))));
                 }
                
                 particle.calcVelo(particle.getVelo(), tasklist.size() / 100, particle.getPbest(), particle.getPos(),
-                        vmlist.size() / 100, swarm.getGbest(), Math.random(), Math.random());
+                        vmlist.size() / 100, swarm.getGbests(), Math.random(), Math.random());
                 particle.calcPos(particle.getPos(), particle.getVelo());
             }
             super.visualizationStrategy.updateAndVisualize(particles);

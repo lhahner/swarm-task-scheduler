@@ -1,5 +1,7 @@
 package pgm.swarm;
 
+import java.lang.reflect.Type;
+
 import pgm.swarm.aco.core.Ant;
 import pgm.swarm.pso.core.Particle;
 
@@ -12,7 +14,7 @@ import pgm.swarm.pso.core.Particle;
  * @author Lennart Hahner
  * @version 1.1.0
  */
-public class SwarmFactory {
+public class SwarmFactory <T> {
 	
 	/**
 	 * This method is espacailly used to create
@@ -33,6 +35,7 @@ public class SwarmFactory {
 		}
 		return null;
 	}
+	
 	/**
 	 * TODO Check regarding a different method instead
 	 * of using the String as an identfier for a certain
@@ -47,16 +50,15 @@ public class SwarmFactory {
 	 * @param agentType the agent type like, ant, bee or particle.
 	 * @return the object for the required particle.
 	 */
-	public Agent getAgent(String agentType) {
-		if(agentType.equals("Particle")) {
+	public Agent getAgent(Class<T> agentType) {
+		if(agentType.equals(Particle.class)) {
 			return new Particle();
 		}
-		else if(agentType.equals("Ant")) {
+		else if(agentType.equals(Ant.class)) {
 			return new Ant();
 		}
 		else {
 			return null;
 		}
 	}
-	
 }

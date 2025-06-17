@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 
+import pgm.swarm.Swarm;
 import pgm.visualization.VisualizationStrategy;
 
 /**
@@ -28,9 +29,9 @@ public class ParticleSwarmOptimization {
      * @param startpos_y The initial y-coordinate of the swarm.
      * @param swarmsize The number of particles in the swarm, which also determines the number of iterations.
      */
-    public void optimize(ParticleSwarm swarm, double startpos_x, double startpos_y, int swarmsize) {
+    public void optimize(Swarm<Particle> swarm, double startpos_x, double startpos_y, int swarmsize) {
         
-        swarm = new ParticleSwarm(startpos_x, startpos_y, swarmsize);
+        swarm = new Swarm<Particle>(startpos_x, startpos_y, swarmsize, Particle.class);
         
         for (int i = 0; i < swarmsize; i++) {
             
@@ -41,11 +42,11 @@ public class ParticleSwarmOptimization {
                     particle.setPbest(pbest);
                 }
                 
-                if (particle.evaluate(particle.getPos()) < particle.evaluate(swarm.getGbest())) {
-                    swarm.setGbest(particle.getPos());
+                if (particle.evaluate(particle.getPos()) < particle.evaluate(swarm.getGbests())) {
+                    swarm.setGbests(particle.getPos());
                 }
                 
-                particle.calcVelo(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGbest(),
+                particle.calcVelo(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGbests(),
                         Math.random(), Math.random());
                 particle.calcPos(particle.getPos(), particle.getVelo());
             }

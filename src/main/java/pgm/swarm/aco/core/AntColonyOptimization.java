@@ -1,6 +1,9 @@
 package pgm.swarm.aco.core;
 import java.util.*;
 
+import pgm.swarm.Agent;
+import pgm.swarm.Swarm;
+
 /**
  * This class implements the Ant-Colony-Optimization (ACO)
  * Algorithm it uses the Ants and Ant-Swarm to optimize 
@@ -18,7 +21,7 @@ public class AntColonyOptimization {
 	  * @param ants swarm of ants 
 	  * @param graph a graph to optimize
 	  */
-	 public double optimize(AntSwarm ants, double[][][] graph) {
+	 public double optimize(Swarm<Ant> ants, double[][][] graph) {
 		int i = 0,j = 0;
 		
 		ArrayList<Integer> edge = new ArrayList<Integer>();

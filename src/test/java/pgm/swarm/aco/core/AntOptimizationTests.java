@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import pgm.simulation.CloudLetUtility;
 import pgm.simulation.DataCenterUtility;
 import pgm.simulation.VirtualMachineUtility;
+import pgm.swarm.Swarm;
 import pgm.swarm.aco.domain.scheduler.AntColonyOptimizationScheduler;
 
 public class AntOptimizationTests {
@@ -26,7 +27,7 @@ public class AntOptimizationTests {
 				{{0.2, 0.1}, {0.5, 0.1}, {0.3, 0.1}},
 				{{0.8, 0.1}, {0.7, 0.1}, {0.3, 0.1}}
 		};
-		assertEquals(0.05, aco.optimize(new AntSwarm(2), graph), 0.01);
+		assertEquals(0.05, aco.optimize(new Swarm<Ant>(2, Ant.class), graph), 0.01);
 	}
 	
 	/**
@@ -42,7 +43,7 @@ public class AntOptimizationTests {
 				{{0.02, 0.1}, {0.5, 0.1}, {0.3, 0.1}},
 				{{0.8, 0.1}, {0.04, 0.1}, {0.3, 0.1}}
 		};
-		assertEquals(0.02, aco.optimize(new AntSwarm(2), graph), 0.01);
+		assertEquals(0.02, aco.optimize(new Swarm<Ant>(2, Ant.class), graph), 0.01);
 	}
 	
 	/**
@@ -61,7 +62,7 @@ public class AntOptimizationTests {
 				{{0.3, 0.1}, {0.023, 0.1}, {0.4, 0.1}},
 				{{0.8, 0.1}, {0.98, 0.1}, {0.3, 0.1}}
 		};
-		assertEquals(0.01, aco.optimize(new AntSwarm(4), graph), 0.01);
+		assertEquals(0.01, aco.optimize(new Swarm<Ant>(4, Ant.class),graph));
 	}
 	
 	/**
@@ -108,7 +109,7 @@ public class AntOptimizationTests {
 				{{0.000000000000001, 0.1}, {0.000000000000001, 0.1}},
 		};
 		
-		aco.optimizeScheduling(new AntSwarm(2), graph, vmh.getVmlist(), clh.getCloudletList(), dcb, 500);
+		aco.optimizeScheduling(new Swarm<Ant>(2, Ant.class), graph, vmh.getVmlist(), clh.getCloudletList(), dcb, 500);
 		
 		assertEquals(0, clh.getCloudletList().get(0).getVm().getId());
 	}
@@ -157,7 +158,7 @@ public class AntOptimizationTests {
 			}
 		}
 		
-		aco.optimizeScheduling(new AntSwarm(2), graph, vmh.getVmlist(), clh.getCloudletList(), dcb, 500);
+		aco.optimizeScheduling(new Swarm<Ant>(2, Ant.class), graph, vmh.getVmlist(), clh.getCloudletList(), dcb, 500);
 		
 		assertEquals(4, clh.getCloudletList().get(4).getVm().getId());
 	}
@@ -206,7 +207,7 @@ public class AntOptimizationTests {
 			}
 		}
 		
-		aco.optimizeScheduling(new AntSwarm(2), graph, vmh.getVmlist(), clh.getCloudletList(), dcb, 500);
+		aco.optimizeScheduling(new Swarm<Ant>(2, Ant.class), graph, vmh.getVmlist(), clh.getCloudletList(), dcb, 500);
 		
 		assertEquals(10, clh.getCloudletList().get(10).getVm().getId());
 	}
@@ -255,7 +256,7 @@ public class AntOptimizationTests {
 			}
 		}
 		
-		aco.optimizeScheduling(new AntSwarm(1), graph, vmh.getVmlist(), clh.getCloudletList(), dcb, 1000);
+		aco.optimizeScheduling(new Swarm<Ant>(1, Ant.class), graph, vmh.getVmlist(), clh.getCloudletList(), dcb, 1000);
 		
 		assertEquals(100, clh.getCloudletList().get(100).getVm().getId());
 	}
