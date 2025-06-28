@@ -4,7 +4,7 @@ Paper-link: https://www.researchgate.net/publication/392096816_Application_of_Sw
 
 The approach involves applying the Particle Swarm Optimization (PSO) 
 algorithm in a program. The primary objective is to identify the 
-global minimum of a given fitness function, which involves the 
+global minimum of a given fitness function, which involves the  
 scheduling of tasks in a cloud environment to keep the usage of 
 performance indicators low, e.g., resource cost or memory consumption.
 
