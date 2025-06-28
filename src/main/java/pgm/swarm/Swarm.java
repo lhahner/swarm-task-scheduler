@@ -62,8 +62,8 @@ public class Swarm<T extends Agent> implements Iterable{
 	/**
 	 * Sets the global optimum
 	 */
-	public void setGbests(double[] gbest) {
-		System.arraycopy(gbest, 0, this.gbest, 0, this.gbests.length);
+	public void setGbests(double[] gbests) {
+		System.arraycopy(gbests, 0, this.gbests, 0, this.gbests.length);
 	}
 	
 	/**
