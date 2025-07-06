@@ -1,5 +1,7 @@
 package pgm.swarm.pso.core;
 
+import lombok.Getter;
+import lombok.Setter;
 import pgm.swarm.Agent;
 
 /** 
@@ -11,6 +13,8 @@ import pgm.swarm.Agent;
  * @version 1.0.0
  * @author Lennart Hahner
  */
+@Setter
+@Getter
 public class Particle implements Agent{
 	
 	/**
@@ -27,24 +31,6 @@ public class Particle implements Agent{
 	 * local best values
 	 */
 	private double[] pbest = {10, 10};
-
-	/**
-	 * Gets the current position of the particle.
-	 * 
-	 * @return the current position of the particle.
-	 */
-	public double[] getPos() {
-		return this.pos;
-	}
-	
-	/**
-	 * Get the current velocity of the particle.
-	 * 
-	 * @return the current velocity of a particle.
-	 */
-	public double[] getVelo() {
-		return velo;
-	}
 	
 	/**
 	 * Sets the current position of the particle.
@@ -124,16 +110,7 @@ public class Particle implements Agent{
 		return "Particle{position=" + this.pos[0] + "," + this.pos[1] + ",velocity=" + this.velo[0] + "," + this.velo[1] + 
 			    ",pbest=" + this.pbest[0] + "," + this.pbest[1] + "} \n";
 	}
-	
-	/**
-	 * Gets the current value of pbest.
-	 * 
-	 * @return the local best position pbest.
-	 */
-	public double[] getPbest() {
-		return pbest;
-	}
-	
+
 	/**
 	 * Sets the values for pbest.
 	 * 
