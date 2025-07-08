@@ -2,7 +2,10 @@ package pgm.swarm.pso.core;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import pgm.swarm.Agent;
+
+import java.util.Arrays;
 
 /** 
  * Particle which is part of the Particle-Swarm-Optimization 
@@ -15,6 +18,7 @@ import pgm.swarm.Agent;
  */
 @Setter
 @Getter
+@Log4j2
 public class Particle implements Agent{
 	
 	/**
@@ -90,14 +94,15 @@ public class Particle implements Agent{
 	 * @param c_2 constant for weighting the values.
 	 * @param global_best possible global best position. 
 	 */
-	public void calcVelo(double[] cur_velo, double c_1, double[] pos_best, double[] pos, double c_2, double[] global_best
-			,double r_1, double r_2) {
-		
-		double velo_x = (cur_velo[0] + c_1 * r_1 * (pos_best[0] - pos[0]) + c_2 * r_2 * (global_best[0] - pos[0]));
-		double velo_y = (cur_velo[1] + c_1 * r_1 * (pos_best[1] - pos[1]) + c_2 * r_2 * (global_best[1] - pos[1]));
-		
-		this.setVelo(velo_x, velo_y);
-		
+	public void calculateVelocity(double[] cur_velo, double c_1, double[] pos_best, double[] pos, double c_2, double[] global_best, double r_1, double r_2) {
+		if (cur_velo.length != pos.length || pos.length != pos_best.length || pos.length != global_best.length) {
+			throw new IllegalArgumentException("All input arrays must have the same length");
+		}
+		this.setVelo(
+				(cur_velo[0] + c_1 * r_1 * (pos_best[0] - pos[0]) + c_2 * r_2 * (global_best[0] - pos[0])),
+				(cur_velo[1] + c_1 * r_1 * (pos_best[1] - pos[1]) + c_2 * r_2 * (global_best[1] - pos[1]))
+		);
+		log.info("Ran calculateVelocity() in class ParticleModified, calculated: {}", Arrays.toString(this.getVelo()));
 	}
 	
 	/**

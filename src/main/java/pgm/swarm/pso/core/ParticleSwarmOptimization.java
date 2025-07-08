@@ -46,7 +46,7 @@ public class ParticleSwarmOptimization {
                     swarm.setGbests(particle.getPos());
                 }
                 
-                particle.calcVelo(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGbests(),
+                particle.calculateVelocity(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGbests(),
                         Math.random(), Math.random());
                 particle.calcPos(particle.getPos(), particle.getVelo());
             }

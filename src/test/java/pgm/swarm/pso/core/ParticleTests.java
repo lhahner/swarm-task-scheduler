@@ -39,7 +39,7 @@ public class ParticleTests {
 		double r_1 = Math.random();
 		double r_2 = Math.random();
 		
-		p.calcVelo(cur_velo, c_1, pos_best, pos, c_2, global_best,
+		p.calculateVelocity(cur_velo, c_1, pos_best, pos, c_2, global_best,
 				r_1, r_2);
 		
 	}

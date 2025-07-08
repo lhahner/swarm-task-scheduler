@@ -1,4 +1,4 @@
-package pgm.swarm.pso.enhanced;
+package pgm.swarm.pso.core.enhanced;
 
 import pgm.swarm.Agent;
 import pgm.swarm.pso.core.Particle;

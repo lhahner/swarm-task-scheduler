@@ -51,7 +51,7 @@ public class ParticleSwarmOptimizationScheduler extends ParticleSwarmOptimizatio
                             vmlist.get(Math.abs((int) Math.round(particle.getPos()[0]))));
                 }
                
-                particle.calcVelo(particle.getVelo(), tasklist.size() / 100, particle.getPbest(), particle.getPos(),
+                particle.calculateVelocity(particle.getVelo(), tasklist.size() / 100, particle.getPbest(), particle.getPos(),
                         vmlist.size() / 100, swarm.getGbests(), Math.random(), Math.random());
                 particle.calcPos(particle.getPos(), particle.getVelo());
             }
