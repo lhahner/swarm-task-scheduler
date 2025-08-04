@@ -25,4 +25,9 @@ public class ParticleModifiedTests {
         );
         assertEquals(0.81, pm.getVelo()[0], 0.0f);
     }
+
+    @Test
+    public void calculateVelocity_areMultipleDimensionsApplicable(){
+        //TODO
+    }
 }
