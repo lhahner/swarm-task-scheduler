@@ -22,8 +22,8 @@ public class SwarmFactory <T> {
 	 * @version 1.1.0 only one PSO is implemented 
 	 * which leads to this descision and the overloading.
 	 * 
-	 * @param pos initial position of the Agent/Particle.
-	 * @param velo initial velocity of the Agent/Particle.
+	 * @param x,y initial position of the Agent/Particle.
+	 * @param velo_x, velo_y initial velocity of the Agent/Particle.
 	 * @return a new Particle.
 	 */
 	public Agent getAgent(double x, double y, double velo_x, double velo_y) {
@@ -37,8 +37,7 @@ public class SwarmFactory <T> {
 	}
 	
 	/**
-	 * TODO Check regarding a different method instead
-	 * of using the String as an identfier for a certain
+	 * Of using the String as an identfier for a certain
 	 * Agent.
 	 * 
 	 * This method will produce the agent based upon 
