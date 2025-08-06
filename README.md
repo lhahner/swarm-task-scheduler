@@ -7,7 +7,7 @@ algorithm in a program. The primary objective is to identify the
 global minimum of a given fitness function, which involves the 
 scheduling of tasks in a cloud environment to keep the usage of 
 performance indicators low, e.g., resource cost or memory consumption.
-
+ 
 The program will be developed in either C or Java, as these 
 programming languages offer familiarity and reliability. After 
 implementation, the application will be tested in a cloud simulation 
