@@ -22,7 +22,6 @@ import java.util.Arrays;
  */
 @Getter
 @Setter
-@Data
 @AllArgsConstructor
 @Log4j2
 public class ParticleModified extends Particle implements Agent {
@@ -33,7 +32,9 @@ public class ParticleModified extends Particle implements Agent {
 	 */
 	private double inertiaWeight;
 
-	// Constants defining the range within which the inertia weight is initialized.
+	/**
+	 * Constants defining the range within which the inertia weight is initialized.
+	 */
 	private final static double START_RANGE = 0.9;
 	private final static double END_RANGE = 1.2;
 
@@ -49,27 +50,37 @@ public class ParticleModified extends Particle implements Agent {
 	 * Calculates the new velocity of the particle based on the PSO velocity update rule.
 	 * The formula considers inertia, cognitive, and social components.
 	 *
-	 * @param cur_velo     Current velocity of the particle (2D vector).
-	 * @param c_1          Cognitive coefficient (attraction to local best).
-	 * @param pos_best     Local best position of the particle (2D).
-	 * @param pos          Current position of the particle (2D).
-	 * @param c_2          Social coefficient (attraction to global best).
-	 * @param global_best  Global best position found by the swarm (2D).
-	 * @param r_1          Random value [0, 1] for stochastic effect on local influence.
-	 * @param r_2          Random value [0, 1] for stochastic effect on global influence.
+	 * @param currentVelocity     Current velocity of the particle (2D vector).
+	 * @param cognitiveLearningFactor          Cognitive coefficient (attraction to local best).
+	 * @param bestPositions     Local best position of the particle (2D).
+	 * @param position          Current position of the particle (2D).
+	 * @param socialLearningFactor          Social coefficient (attraction to global best).
+	 * @param globalBestPositions  Global best position found by the swarm (2D).
+	 * @param randomValueOne          Random value [0, 1] for stochastic effect on local influence.
+	 * @param randomValueTwo          Random value [0, 1] for stochastic effect on global influence.
 	 */
 	@Override
-	public void calculateVelocity(double[] cur_velo, double c_1, double[] pos_best, double[] pos, double c_2, double[] global_best, double r_1, double r_2) {
-		if (cur_velo.length != pos.length || pos.length != pos_best.length || pos.length != global_best.length) {
+	public void calculateVelocity(
+			double[] currentVelocity,
+			double cognitiveLearningFactor,
+			double[] bestPositions,
+			double[] position,
+			double socialLearningFactor,
+			double[] globalBestPositions,
+			double randomValueOne,
+			double randomValueTwo) {
+		if (currentVelocity.length != position.length
+				|| position.length != bestPositions.length
+				|| position.length != globalBestPositions.length) {
 			throw new IllegalArgumentException("All input arrays must have the same length");
 		}
-		double[] newVelo = new double[cur_velo.length];
-		for (int i = 0; i < cur_velo.length; i++) {
-			newVelo[i] = inertiaWeight * cur_velo[i]
-					+ c_1 * r_1 * (pos_best[i] - pos[i])
-					+ c_2 * r_2 * (global_best[i] - pos[i]);
+		double[] newVelocity = new double[currentVelocity.length];
+		for (int i = 0; i < currentVelocity.length; i++) {
+			newVelocity[i] = inertiaWeight * currentVelocity[i]
+					+ cognitiveLearningFactor * randomValueOne * (bestPositions[i] - position[i])
+					+ socialLearningFactor * randomValueTwo * (globalBestPositions[i] - position[i]);
 		}
-		this.setVelo(newVelo);
+		this.setVelo(newVelocity);
 		log.info("Ran calculateVelocity() in class ParticleModified, calculated: {}", Arrays.toString(this.getVelo()));
 	}
 

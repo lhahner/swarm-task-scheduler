@@ -1,7 +1,6 @@
 package pgm.swarm.pso.core.enhanced;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -19,14 +18,13 @@ import java.util.List;
  * Improves native Particle class by adding population assignment capabilities
  * as assigned in the paper.
  *
- * @Source https://doi.org/10.1007/s12652-023-04541-9
+ * @Source <a href="https://doi.org/10.1007/s12652-023-04541-9">Paper Reference</a>
  */
 @Getter
 @Setter
-@Data
 @AllArgsConstructor
 @Log4j2
-public class ParticleImproved extends Particle implements Agent {
+public class ParticleMultiAdaptive extends Particle implements Agent {
 
     /**
      * Represents the number of particles that exist a given distance to particle i.
@@ -51,7 +49,7 @@ public class ParticleImproved extends Particle implements Agent {
      * @param swarm The swarm in which the particle is part of.
      * @return The density calculated for the particle
      */
-    public double setLocalDensity(Swarm swarm) {
+    public double setLocalDensity(Swarm<Particle> swarm) {
         double localDensity = 0;
         for(Particle particle : (ArrayList<Particle>)swarm.getAgents()){
             localDensity = localDensity + Math.exp(

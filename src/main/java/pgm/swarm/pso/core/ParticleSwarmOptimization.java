@@ -22,31 +22,25 @@ public class ParticleSwarmOptimization {
     
     /**
      * Optimizes a given swarm starting from a specified position over a defined number of iterations.
-     * This is domain independed.
+     * This is domain independent.
      * 
      * @param swarm The swarm to be optimized.
-     * @param startpos_x The initial x-coordinate of the swarm.
-     * @param startpos_y The initial y-coordinate of the swarm.
-     * @param swarmsize The number of particles in the swarm, which also determines the number of iterations.
+     * @param startPositionAtX The initial x-coordinate of the swarm.
+     * @param startPositionAtY The initial y-coordinate of the swarm.
+     * @param swarmSize The number of particles in the swarm, which also determines the number of iterations.
      */
-    public void optimize(Swarm<Particle> swarm, double startpos_x, double startpos_y, int swarmsize) {
-        
-        swarm = new Swarm<Particle>(startpos_x, startpos_y, swarmsize, Particle.class);
-        
-        for (int i = 0; i < swarmsize; i++) {
-            
+    public void optimize(Swarm<Particle> swarm, double startPositionAtX, double startPositionAtY, int swarmSize) {
+        swarm = new Swarm<Particle>(startPositionAtX, startPositionAtY, swarmSize, Particle.class);
+        for (int i = 0; i < swarmSize; i++) {
             for (Particle particle : swarm.getAgents()) {
-                
                 if (particle.evaluate(particle.getPos()) < particle.evaluate(particle.getPbest())) {
                     double[] pbest = particle.getPos();
                     particle.setPbest(pbest);
                 }
-                
-                if (particle.evaluate(particle.getPos()) < particle.evaluate(swarm.getGbests())) {
-                    swarm.setGbests(particle.getPos());
+                if (particle.evaluate(particle.getPos()) < particle.evaluate(swarm.getGlobalBests())) {
+                    swarm.setGlobalBests(particle.getPos());
                 }
-                
-                particle.calculateVelocity(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGbests(),
+                particle.calculateVelocity(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGlobalBests(),
                         Math.random(), Math.random());
                 particle.calcPos(particle.getPos(), particle.getVelo());
             }
@@ -54,31 +48,29 @@ public class ParticleSwarmOptimization {
     }
     
     /**
-     * This method will check if the postion of the particle is too large to be in the scope
-     * of the provided VMs and provided Tasks and afterwards will set the position of the particles
+     * This method will check if the position of the particle is too large to be in the scope
+     * of the provided VMs and provided Tasks and afterward will set the position of the particles
      * to random.
      * 
      * @param particle The particle which should be checked and changed.
-     * @param vmlist The List of VMs used.
-     * @param tasklist The List of Tasks used.
-     * @param scalingFactor is used to set the random assignment of the particles to a proper starting value, to not to start to low.
+     * @param vmList The List of VMs used.
+     * @param taskList The List of Tasks used
      */
-    protected void resetParticlesOutOfRange(Particle particle, ArrayList<Vm> vmlist, ArrayList<CloudletSimple> tasklist) {
-    	int scalingFactor = tasklist.size() > vmlist.size() ? tasklist.size() : vmlist.size();
-    	
-    	if (particle.getPos()[0] >= vmlist.size()) {
+    protected void resetParticlesOutOfRange(Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
+    	int scalingFactor = taskList.size() > vmList.size() ? taskList.size() : vmList.size();
+    	if (particle.getPos()[0] >= vmList.size()) {
             particle.setPosX(Math.random() * scalingFactor);
         }
-        if (particle.getPos()[1] >= tasklist.size()) {
+        if (particle.getPos()[1] >= taskList.size()) {
             particle.setPosY(Math.random() * scalingFactor);
         }
     }
     
     /**
-     * Should provide and assign a Visualiation strategy specified for the PSO algorithm.
+     * Should provide and assign a Visualization strategy specified for the PSO algorithm.
      * 
-     * @param visualizationStrategy the strategy to be peformed for the current use-case
-     * @return the strategy to be peformed for the current use-case
+     * @param visualizationStrategy the strategy to be performed for the current use-case
+     * @return the strategy to be performed for the current use-case
      */
     protected VisualizationStrategy setAndGetVisualizationStrategy(VisualizationStrategy visualizationStrategy) {
     	this.visualizationStrategy = visualizationStrategy;

@@ -1,12 +1,10 @@
 package pgm.swarm;
 
-import java.lang.reflect.Type;
-
 import pgm.swarm.aco.core.Ant;
 import pgm.swarm.pso.core.Particle;
 
 /**
- * This factory will generate the Agents necassry for a
+ * This factory will generate the Agents necessary for a
  * Swarm. So whenever a swarm is made up, this method
  * should be called to produce a swarm upon the required
  * agents.
@@ -17,33 +15,29 @@ import pgm.swarm.pso.core.Particle;
 public class SwarmFactory <T> {
 	
 	/**
-	 * This method is espacailly used to create
+	 * This method is especially used to create
 	 * an Agent of the type particle, in the current
-	 * @version 1.1.0 only one PSO is implemented 
-	 * which leads to this descision and the overloading.
-	 * 
-	 * @param x,y initial position of the Agent/Particle.
-	 * @param velo_x, velo_y initial velocity of the Agent/Particle.
+	 *
+	 * @param positionAtX,positionAtY initial position of the Agent/Particle.
+	 * @param velocityAtX, the initial velocity of the Agent/Particle.
 	 * @return a new Particle.
 	 */
-	public Agent getAgent(double x, double y, double velo_x, double velo_y) {
-		if((x >= 0 && y >= 0) && (velo_x >= 0 && velo_y >= 0)) {
+	public Agent getAgent(double positionAtX, double positionAtY, double velocityAtX, double velocityAtY) {
+		if((positionAtX >= 0 && positionAtY >= 0) && (velocityAtX >= 0 && velocityAtY >= 0)) {
 			Particle particle = new Particle();
-			particle.setPos(x, y);
-			particle.setVelo(velo_x, velo_y);
+			particle.setPos(positionAtX, positionAtY);
+			particle.setVelo(velocityAtX, velocityAtY);
 			return particle;
 		}
-		return null;
+		throw new IllegalArgumentException("position or velocity are invalid");
 	}
 	
 	/**
-	 * Of using the String as an identfier for a certain
-	 * Agent.
-	 * 
-	 * This method will produce the agent based upon 
+	 * Of using the String as an identifier for a certain
+	 * Agent. This method will produce the agent based upon
 	 * which swarm is required. It is returning the
 	 * required object after providing the string.
-	 * For example if "Particle" is given as input,
+	 * For example, if "Particle" is given as input,
 	 * the method will return a particle.
 	 * 
 	 * @param agentType the agent type like, ant, bee or particle.
@@ -57,7 +51,7 @@ public class SwarmFactory <T> {
 			return new Ant();
 		}
 		else {
-			return null;
+			throw new IllegalArgumentException("Agent type not supported");
 		}
 	}
 }

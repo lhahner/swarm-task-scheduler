@@ -1,112 +1,80 @@
 package pgm.swarm;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
-import pgm.swarm.pso.core.Particle;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Type;
+@Getter
+@Setter
+@AllArgsConstructor
+@Log4j2
+public class Swarm<T extends Agent> implements Iterable<T> {
 
-public class Swarm<T extends Agent> implements Iterable{
-
+	private int seed = ThreadLocalRandom.current().nextInt(10, 100 + 1);
 	private int dimension;
 	private Class<T> clazz;
-	private ArrayList<T> agents;
-	private double[] gbests = {10,10};
-	private double gbest = 10;
-	
+	private List<T> agents;
+	private double[] globalBests = {seed, seed};
+	private double globalBest = seed;
+
 	public Swarm(int size, Class<T> clazz) {
 		this.clazz = clazz;
-		agents = new ArrayList<>();
-		
-		for(int i = 0; i<size;i++) {
+		this.agents = new ArrayList<>();
+
+		for (int i = 0; i < size; i++) {
 			try {
 				agents.add((T) new SwarmFactory<T>().getAgent(this.clazz));
-			
-			} catch(Exception e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				log.warn("Failed to create agent", e);
 			}
 		}
 	}
-	
+
 	public Swarm(double start_x, double start_y, int size, Class<T> clazz) {
 		this.clazz = clazz;
-		agents = new ArrayList<T>();
-		for (int i = 0; size > i; i++) {
+		this.agents = new ArrayList<>();
 
+		for (int i = 0; i < size; i++) {
 			start_x = Math.sqrt(start_x);
 			start_y = Math.sqrt(start_y);
 
-			agents.add((T) new SwarmFactory().getAgent(this.clazz));
+			try {
+				agents.add((T) new SwarmFactory<T>().getAgent(this.clazz));
+			} catch (Exception e) {
+				log.warn("Failed to create agent", e);
+			}
 		}
 	}
-	
-	public int getDimension() {
-		return dimension;
-	}
-
-	public void setDimension(int dimension) {
-		this.dimension = dimension;
-	}
-
-	public void setAgents(ArrayList<T> agents) {
-		this.agents = agents;
-	}
-	
-	public ArrayList<T> getAgents(){
-		return this.agents;
-	}
-	
-	/**
-	 * Sets the global optimum
-	 */
-	public void setGbests(double[] gbests) {
-		System.arraycopy(gbests, 0, this.gbests, 0, this.gbests.length);
-	}
-	
-	/**
-	 * gets the global best
-	 */
-	public double[] getGbests() {
-		return this.gbests;
-	}
-	
-	/**
-	 * Return the current global best for the swarm
-	 * 
-	 * @return global best position
-	 */
-	public double getGbest() {
-		return gbest;
-	}
 
 	/**
-	 * Will set the gbest array for this swarm.
-	 * 
-	 * @param gbest The index of the global best position.
+	 * Sets the global optimum.
 	 */
-	public void setGbest(double gbest) {
-		this.gbest = gbest;
+	public void setGlobalBests(double[] globalBests) {
+		int len = Math.min(globalBests.length, this.globalBests.length);
+		System.arraycopy(globalBests, 0, this.globalBests, 0, len);
 	}
-	
+
 	/**
 	 * Returns the complete swarm and its values as a String.
 	 */
 	@Override
 	public String toString() {
-		String swarm_str = "\n";
-		
-		for(T particle : this.getAgents()) {
-			swarm_str = swarm_str + particle.toString();
+		StringBuilder sb = new StringBuilder("\n");
+		for (T particle : this.getAgents()) {
+			sb.append(particle);
 		}
-		
-		return swarm_str;
+		return sb.toString();
 	}
 
 	@Override
-	public Iterator iterator() {
+	public @NotNull Iterator<T> iterator() {
 		return agents.iterator();
 	}
 }

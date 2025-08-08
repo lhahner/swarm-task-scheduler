@@ -40,9 +40,9 @@ public class AntColonyOptimizationScheduler extends AntColonyOptimization{
 				 
 				 ant.calcPossibleNextVisit(i, graph[i]);
 				 
-				 if(ants.getGbest() > graph[edge.get(0)][edge.get(1)][0]) {
+				 if(ants.getGlobalBest() > graph[edge.get(0)][edge.get(1)][0]) {
 					 broker.bindCloudletToVm(tasks.get(edge.get(0)), vms.get(edge.get(1)));
-					 ants.setGbest(graph[edge.get(0)][edge.get(1)][0]);
+					 ants.setGlobalbest(graph[edge.get(0)][edge.get(1)][0]);
 				 }
 
 				 edge.set(0, i);
@@ -53,7 +53,7 @@ public class AntColonyOptimizationScheduler extends AntColonyOptimization{
 			 ant.clearTrail();
 		 }
 		}
-		return ants.getGbest();
+		return ants.getGlobalBest();
 	 }
 	 
 	 /**

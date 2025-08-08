@@ -15,7 +15,7 @@ import pgm.visualization.VisualizationStrategy;
 public class ParticleSwarmOptimizationScheduler extends ParticleSwarmOptimization{
 	/**
      * Optimizes task scheduling by minimizing the makespan (total execution time) for tasks on available VMs.
-     * This is domain depended and specfically used for Task-Scheduling in Cloud Computing.
+     * This domain depended on and specifically used for Task-Scheduling in Cloud Computing.
      *
      * @param swarm The swarm used for optimization.
      * @param tasklist The list of tasks in the simulation.
@@ -27,11 +27,10 @@ public class ParticleSwarmOptimizationScheduler extends ParticleSwarmOptimizatio
     public void optimizeSchedueling(Swarm<Particle> swarm, ArrayList<CloudletSimple> tasklist, ArrayList<Vm> vmlist, DatacenterBrokerSimple broker, int n, VisualizationStrategy visualization) {
 	
 		swarm = new Swarm<Particle>(0, 0, tasklist.size(), Particle.class);
-        ArrayList<Particle> particles = swarm.getAgents();
+        ArrayList<Particle> particles = (ArrayList<Particle>)swarm.getAgents();
         
         super.setAndGetVisualizationStrategy(visualization)
-        	.visualize(particles, 
-        				tasklist.size() > vmlist.size()? tasklist.size() : vmlist.size());
+        	.visualize(particles, tasklist.size() > vmlist.size()? tasklist.size() : vmlist.size());
         
         for (int i = 0; i < n; i++) {
             for (Particle particle : particles) {
@@ -45,14 +44,14 @@ public class ParticleSwarmOptimizationScheduler extends ParticleSwarmOptimizatio
                 }
                 
                 if (this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
-                        < this.evaluateSchedueling(swarm.getGbests(), tasklist, vmlist)) {
-                    swarm.setGbests(particle.getPos());
+                        < this.evaluateSchedueling(swarm.getGlobalBests(), tasklist, vmlist)) {
+                    swarm.setGlobalBests(particle.getPos());
                     broker.bindCloudletToVm(tasklist.get(Math.abs((int) Math.round(particle.getPos()[1]))), 
                             vmlist.get(Math.abs((int) Math.round(particle.getPos()[0]))));
                 }
                
                 particle.calculateVelocity(particle.getVelo(), tasklist.size() / 100, particle.getPbest(), particle.getPos(),
-                        vmlist.size() / 100, swarm.getGbests(), Math.random(), Math.random());
+                        vmlist.size() / 100, swarm.getGlobalBests(), Math.random(), Math.random());
                 particle.calcPos(particle.getPos(), particle.getVelo());
             }
             super.visualizationStrategy.updateAndVisualize(particles);

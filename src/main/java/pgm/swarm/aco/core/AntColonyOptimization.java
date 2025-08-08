@@ -1,7 +1,6 @@
 package pgm.swarm.aco.core;
 import java.util.*;
 
-import pgm.swarm.Agent;
 import pgm.swarm.Swarm;
 
 /**
@@ -36,8 +35,8 @@ public class AntColonyOptimization {
 				 ant.calcPossibleNextVisit(i, graph[i]);
 				 graph[i][ant.getPos()][1] = ant.updatePheronome(graph[i][j][1], 2);
 				 
-				 if(ants.getGbest() > graph[i][ant.getPos()][0]) {
-					 ants.setGbest(graph[i][ant.getPos()][0]);
+				 if(ants.getGlobalBest() > graph[i][ant.getPos()][0]) {
+					 ants.setGlobalbest(graph[i][ant.getPos()][0]);
 				 }
 				 
 				 edge.set(0, i);
@@ -48,6 +47,6 @@ public class AntColonyOptimization {
 			 ant.clearTrail();
 		 }
 		}
-		return ants.getGbest();
+		return ants.getGlobalBest();
 	 }
 }
