@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import pgm.swarm.Agent;
 
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 /** 
  * Particle which is part of the Particle-Swarm-Optimization 
@@ -20,7 +21,9 @@ import java.util.Arrays;
 @Getter
 @Log4j2
 public class Particle implements Agent{
-	
+
+	private int seed = ThreadLocalRandom.current().nextInt(10, 100 + 1);
+
 	/**
 	 * Stores the current position of the particle.
 	 */
@@ -30,11 +33,31 @@ public class Particle implements Agent{
 	 * stores the current velocity of the particle. 
 	 */
 	private double[] velo = new double[2];
-	
+
+	/**
+	 * Inertia weight factor that scales the influence of the previous velocity.
+	 * Helps balance exploration (global search) and exploitation (local refinement).
+	 */
+	private double inertiaWeight;
+
+	/**
+	 * Constants defining the range within which the inertia weight is initialized.
+	 */
+	private final static double START_RANGE = 0.9;
+	private final static double END_RANGE = 1.2;
+
 	/**
 	 * local best values
 	 */
 	private double[] pbest = {10, 10};
+
+	/**
+	 * Default constructor.
+	 * Initializes the particle with a randomly generated inertia weight within the defined range.
+	 */
+	public Particle() {
+		this.setInertiaWeight(this.calculateInertiaWeight(START_RANGE, END_RANGE));
+	}
 	
 	/**
 	 * Sets the current position of the particle.
@@ -99,8 +122,8 @@ public class Particle implements Agent{
 			throw new IllegalArgumentException("All input arrays must have the same length");
 		}
 		this.setVelo(
-				(cur_velo[0] + c_1 * r_1 * (pos_best[0] - pos[0]) + c_2 * r_2 * (global_best[0] - pos[0])),
-				(cur_velo[1] + c_1 * r_1 * (pos_best[1] - pos[1]) + c_2 * r_2 * (global_best[1] - pos[1]))
+				(inertiaWeight * cur_velo[0] + c_1 * r_1 * (pos_best[0] - pos[0]) + c_2 * r_2 * (global_best[0] - pos[0])),
+				(inertiaWeight * cur_velo[1] + c_1 * r_1 * (pos_best[1] - pos[1]) + c_2 * r_2 * (global_best[1] - pos[1]))
 		);
 		log.info("Ran calculateVelocity() in class ParticleModified, calculated: {}", Arrays.toString(this.getVelo()));
 	}
@@ -139,5 +162,20 @@ public class Particle implements Agent{
 			fitness += pos * pos;
 		}
 		return fitness;
+	}
+
+
+
+	/**
+	 * Randomly generates an inertia weight within a specified range.
+	 * This randomness can help promote diversity in the swarm's behavior,
+	 * balancing between global exploration and local exploitation.
+	 *
+	 * @param min Lower bound of inertia weight.
+	 * @param max   Upper bound of inertia weight.
+	 * @return A random inertia weight within [min, end_range].
+	 */
+	public double calculateInertiaWeight(double min, double max) {
+		return ((Math.random() * (max - min)) + min);
 	}
 }

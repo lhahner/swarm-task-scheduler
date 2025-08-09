@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import pgm.swarm.Agent;
+import pgm.swarm.pso.core.Particle;
+
 import java.util.List;
 
 /**
@@ -16,7 +18,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @Log4j2
-public class ParticleMultiobject extends ParticleModified implements Agent {
+public class ParticleMultiobject extends Particle implements Agent {
 
     /**
      * This Method will return a pareto random optimal solution from the pareto

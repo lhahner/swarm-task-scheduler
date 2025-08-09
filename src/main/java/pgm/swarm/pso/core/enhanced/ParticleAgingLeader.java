@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import pgm.swarm.Agent;
+import pgm.swarm.pso.core.Particle;
 
 /**
  * Implements an optimization technique that uses an aging model to
@@ -20,7 +21,7 @@ import pgm.swarm.Agent;
 @Setter
 @AllArgsConstructor
 @Log4j2
-public class ParticleAgingLeader extends ParticleModified implements Agent {
+public class ParticleAgingLeader extends Particle implements Agent {
 
     /**
      * Hyperparameter for setting the max duration of time to be a leader.
