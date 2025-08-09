@@ -1,4 +1,4 @@
-package pgm.swarm.pso.core.enhanced;
+package pgm.swarm.pso.core.decorators;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +24,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @Log4j2
-public class ParticleMultiAdaptive extends Particle implements Agent {
+public class MultiAdaptiveParticle extends Particle implements Agent {
 
     /**
      * Represents the number of particles that exist a given distance to particle i.

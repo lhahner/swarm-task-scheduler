@@ -12,8 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * Particle which is part of the Particle-Swarm-Optimization 
  * algorithm. This version of the Particle implements a two-dimensional
  * Array for representing the position of the Ant.
- * 
- * 
+ *
  * @version 1.0.0
  * @author Lennart Hahner
  */
@@ -163,8 +162,6 @@ public class Particle implements Agent{
 		}
 		return fitness;
 	}
-
-
 
 	/**
 	 * Randomly generates an inertia weight within a specified range.

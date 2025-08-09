@@ -37,16 +37,16 @@ public class ParticleSwarmOptimizationScheduler extends ParticleSwarmOptimizatio
                 
             	resetParticlesOutOfRange(particle, vmlist, tasklist);
                 
-                if (this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
+                if (this.evaluateSchedueling(particle.getPos(), tasklist, vmlist)
                         < this.evaluateSchedueling(particle.getPbest(), tasklist, vmlist)) {
                     double[] pbest = particle.getPos();
                     particle.setPbest(pbest);
                 }
                 
-                if (this.evaluateSchedueling(particle.getPos(), tasklist, vmlist) 
+                if (this.evaluateSchedueling(particle.getPos(), tasklist, vmlist)
                         < this.evaluateSchedueling(swarm.getGlobalBests(), tasklist, vmlist)) {
                     swarm.setGlobalBests(particle.getPos());
-                    broker.bindCloudletToVm(tasklist.get(Math.abs((int) Math.round(particle.getPos()[1]))), 
+                    broker.bindCloudletToVm(tasklist.get(Math.abs((int) Math.round(particle.getPos()[1]))),
                             vmlist.get(Math.abs((int) Math.round(particle.getPos()[0]))));
                 }
                

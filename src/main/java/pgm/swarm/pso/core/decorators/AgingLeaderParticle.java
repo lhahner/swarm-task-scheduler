@@ -1,4 +1,4 @@
-package pgm.swarm.pso.core.enhanced;
+package pgm.swarm.pso.core.decorators;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +21,7 @@ import pgm.swarm.pso.core.Particle;
 @Setter
 @AllArgsConstructor
 @Log4j2
-public class ParticleAgingLeader extends Particle implements Agent {
+public class AgingLeaderParticle extends Particle implements Agent {
 
     /**
      * Hyperparameter for setting the max duration of time to be a leader.
