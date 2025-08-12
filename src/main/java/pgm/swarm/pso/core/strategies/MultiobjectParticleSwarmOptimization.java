@@ -1,5 +1,10 @@
 package pgm.swarm.pso.core.strategies;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 import pgm.swarm.Swarm;
@@ -8,9 +13,17 @@ import pgm.visualization.VisualizationStrategy;
 
 import java.util.ArrayList;
 
+@Setter
+@Getter
+@Log4j2
+@AllArgsConstructor
+@NoArgsConstructor
 public class MultiobjectParticleSwarmOptimization implements OptimizationStrategy {
     protected VisualizationStrategy visualizationStrategy;
 
+    public void createPopulation(){
+
+    }
     /**
      * Optimizes a given swarm starting from a specified position over a defined number of iterations.
      * This is domain independent.
@@ -22,7 +35,7 @@ public class MultiobjectParticleSwarmOptimization implements OptimizationStrateg
      */
     public void optimize(Swarm<Particle> swarm, double startPositionAtX, double startPositionAtY, int swarmSize) {
         swarm = new Swarm<Particle>(startPositionAtX, startPositionAtY, swarmSize, Particle.class);
-        for (int i = 0; i < swarmSize; i++) {
+        for (int i = 0; i < swarmSize; i++) { //Epochs
             for (Particle particle : swarm.getAgents()) {
                 if (particle.evaluate(particle.getPos()) < particle.evaluate(particle.getPbest())) {
                     double[] pbest = particle.getPos();
@@ -38,6 +51,8 @@ public class MultiobjectParticleSwarmOptimization implements OptimizationStrateg
         }
     }
 
+
+
     /**
      * This method will check if the position of the particle is too large to be in the scope
      * of the provided VMs and provided Tasks and afterward will set the position of the particles
@@ -48,7 +63,7 @@ public class MultiobjectParticleSwarmOptimization implements OptimizationStrateg
      * @param taskList The List of Tasks used
      */
     protected void resetParticlesOutOfRange(Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
-        int scalingFactor = taskList.size() > vmList.size() ? taskList.size() : vmList.size();
+        int scalingFactor = Math.max(taskList.size(), vmList.size());
         if (particle.getPos()[0] >= vmList.size()) {
             particle.setPosX(Math.random() * scalingFactor);
         }

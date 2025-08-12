@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import pgm.swarm.Agent;
+import pgm.swarm.Population;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +24,13 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @Log4j2
-public class MultiAdaptiveParticle extends Particle implements Agent {
+public class MultiAdaptiveParticle extends Particle {
+
+    /**
+     * Specifies whether this particle is the local best
+     * Particle leading the population.
+     */
+    private boolean isLocalBest;
 
     /**
      * Represents the number of particles that exist a given distance to particle i.
@@ -40,6 +46,20 @@ public class MultiAdaptiveParticle extends Particle implements Agent {
      * Distance is considered as the minimum distance between particle i and each particle with the highes density.
      */
     private double distance;
+
+    /**
+     * Calculates the velocity for every localBest particle if it's not local best it uses the normal update velocity.
+     */
+    public void updateVelocityLocalBest(double[] cur_velo, double c_1, double[] pos_best, double[] pos, double c_2, double[] global_best, double r_1, double r_2, int numberOfPopulations, List<Population<Particle>> population){
+        if (cur_velo.length != pos.length || pos.length != pos_best.length || pos.length != global_best.length) {
+            throw new IllegalArgumentException("All input arrays must have the same length");
+        }
+        this.setVelo(
+                (super.getInertiaWeight() * cur_velo[0] + c_1 * r_1 * (pos_best[0] - pos[0]) + c_2 * r_2 * (this.calculateAverageGlobalBest(population, numberOfPopulations) - pos[0])),
+                (super.getInertiaWeight() * cur_velo[1] + c_1 * r_1 * (pos_best[1] - pos[1]) + c_2 * r_2 * (this.calculateAverageGlobalBest(population, numberOfPopulations) - pos[1]))
+        );
+        log.info("Ran calculateVelocity() in class ParticleModified, calculated: {}", Arrays.toString(this.getVelo()));
+    }
 
     /**
      * This function will set the localDensity for a particle.
@@ -58,6 +78,21 @@ public class MultiAdaptiveParticle extends Particle implements Agent {
         }
         this.localDensity = localDensity;
         return localDensity;
+    }
+
+    /**
+     * The Average Global best is defined by summing all local bests of each subpopulation.
+     *
+     * @param populations a list of populations which separates the swarm.
+     * @param numberOfPopulations the number of populations which divide the swarm.
+     * @return a float value which represents the average global best.
+     */
+    public double calculateAverageGlobalBest(List<Population<Particle>> populations, int numberOfPopulations) {
+        List<Double> globalBests = new ArrayList<Double>();
+        for(Population<Particle> population : populations) {
+            globalBests.add(Arrays.stream(population.getLocalBest()).sum());
+        }
+        return globalBests.stream().mapToDouble(Double::doubleValue).sum()/numberOfPopulations;
     }
 
     /**

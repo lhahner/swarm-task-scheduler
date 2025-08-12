@@ -27,6 +27,11 @@ public class Population<T extends Agent> {
     private List<T> population;
 
     /**
+     * Holds the position of the local best agent.
+     */
+    private double[] localBest;
+
+    /**
      * Add an Agent to the population. A population is a subgroup inside the swarm
      * and can be used to make agents run on local based problems
      * @param agent The agent which should be added to the population

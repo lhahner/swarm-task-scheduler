@@ -1,5 +1,10 @@
 package pgm.swarm.pso.core.strategies;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 import pgm.swarm.Swarm;
@@ -8,6 +13,11 @@ import pgm.visualization.VisualizationStrategy;
 
 import java.util.ArrayList;
 
+@Setter
+@Getter
+@Log4j2
+@AllArgsConstructor
+@NoArgsConstructor
 public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrategy {
     protected VisualizationStrategy visualizationStrategy;
 
@@ -21,21 +31,7 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
      * @param swarmSize The number of particles in the swarm, which also determines the number of iterations.
      */
     public void optimize(Swarm<Particle> swarm, double startPositionAtX, double startPositionAtY, int swarmSize) {
-        swarm = new Swarm<Particle>(startPositionAtX, startPositionAtY, swarmSize, Particle.class);
-        for (int i = 0; i < swarmSize; i++) {
-            for (Particle particle : swarm.getAgents()) {
-                if (particle.evaluate(particle.getPos()) < particle.evaluate(particle.getPbest())) {
-                    double[] pbest = particle.getPos();
-                    particle.setPbest(pbest);
-                }
-                if (particle.evaluate(particle.getPos()) < particle.evaluate(swarm.getGlobalBests())) {
-                    swarm.setGlobalBests(particle.getPos());
-                }
-                particle.calculateVelocity(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGlobalBests(),
-                        Math.random(), Math.random());
-                particle.calcPos(particle.getPos(), particle.getVelo());
-            }
-        }
+
     }
 
     /**

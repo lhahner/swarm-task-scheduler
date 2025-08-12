@@ -9,10 +9,10 @@ import org.cloudsimplus.vms.Vm;
 
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
-import pgm.swarm.pso.core.ParticleSwarmOptimization;
+import pgm.swarm.pso.core.strategies.ParticleSwarmOptimization;
 import pgm.visualization.VisualizationStrategy;
 
-public class ParticleSwarmOptimizationScheduler extends ParticleSwarmOptimization{
+public class ParticleSwarmOptimizationScheduler extends ParticleSwarmOptimization {
 	/**
      * Optimizes task scheduling by minimizing the makespan (total execution time) for tasks on available VMs.
      * This domain depended on and specifically used for Task-Scheduling in Cloud Computing.
