@@ -24,6 +24,7 @@ public class MultiobjectParticleSwarmOptimization implements OptimizationStrateg
     public void createPopulation(){
 
     }
+
     /**
      * Optimizes a given swarm starting from a specified position over a defined number of iterations.
      * This is domain independent.
@@ -50,8 +51,6 @@ public class MultiobjectParticleSwarmOptimization implements OptimizationStrateg
             }
         }
     }
-
-
 
     /**
      * This method will check if the position of the particle is too large to be in the scope
