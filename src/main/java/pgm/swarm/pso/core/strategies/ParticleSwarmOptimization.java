@@ -21,7 +21,7 @@ import java.util.ArrayList;
 @Setter
 @Getter
 @Log4j2
-public class ParticleSwarmOptimization implements OptimizationStrategy {
+public class ParticleSwarmOptimization implements OptimizationStrategy<Particle> {
 
     protected VisualizationStrategy visualizationStrategy;
 

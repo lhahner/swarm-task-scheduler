@@ -9,6 +9,7 @@ import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
+import pgm.swarm.pso.core.decorators.AgingLeaderParticle;
 import pgm.visualization.VisualizationStrategy;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 @Log4j2
 @AllArgsConstructor
 @NoArgsConstructor
-public class AgingLeaderParticleSwarmOptimization implements OptimizationStrategy{
+public class AgingLeaderParticleSwarmOptimization implements OptimizationStrategy<AgingLeaderParticle> {
 
     protected VisualizationStrategy visualizationStrategy;
     /**
@@ -30,7 +31,7 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
      * @param startPositionAtY The initial y-coordinate of the swarm.
      * @param swarmSize The number of particles in the swarm, which also determines the number of iterations.
      */
-    public void optimize(Swarm<Particle> swarm, double startPositionAtX, double startPositionAtY, int swarmSize) {
+    public void optimize(Swarm<AgingLeaderParticle> swarm, double startPositionAtX, double startPositionAtY, int swarmSize) {
 
     }
 

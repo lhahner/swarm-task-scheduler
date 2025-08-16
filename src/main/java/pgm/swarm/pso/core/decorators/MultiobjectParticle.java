@@ -18,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 @Log4j2
 public class MultiobjectParticle extends Particle implements Agent {
-
     /**
      * This Method will return a pareto random optimal solution from the pareto
      * archive, used for the particle to follow. In Multi Objective Optimization,

@@ -7,23 +7,29 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
+import org.jetbrains.annotations.NotNull;
+import pgm.swarm.Agent;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
+import pgm.swarm.pso.core.decorators.MultiobjectParticle;
 import pgm.visualization.VisualizationStrategy;
 
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.IntStream;
 
+/**
+ *
+ */
 @Setter
 @Getter
 @Log4j2
 @AllArgsConstructor
 @NoArgsConstructor
-public class MultiobjectParticleSwarmOptimization implements OptimizationStrategy {
+public class MultiobjectParticleSwarmOptimization implements OptimizationStrategy<MultiobjectParticle> {
     protected VisualizationStrategy visualizationStrategy;
 
-    public void createPopulation(){
-
-    }
+    /*Stores the set of all objective vectors corresponding to the pareto optimal solutions. */
+    private Map<Integer, Double> paretoFront;
 
     /**
      * Optimizes a given swarm starting from a specified position over a defined number of iterations.
@@ -34,10 +40,10 @@ public class MultiobjectParticleSwarmOptimization implements OptimizationStrateg
      * @param startPositionAtY The initial y-coordinate of the swarm.
      * @param swarmSize The number of particles in the swarm, which also determines the number of iterations.
      */
-    public void optimize(Swarm<Particle> swarm, double startPositionAtX, double startPositionAtY, int swarmSize) {
-        swarm = new Swarm<Particle>(startPositionAtX, startPositionAtY, swarmSize, Particle.class);
+    public void optimize(Swarm<MultiobjectParticle> swarm, double startPositionAtX, double startPositionAtY, int swarmSize) {
+        swarm = new Swarm<MultiobjectParticle>(startPositionAtX, startPositionAtY, swarmSize, MultiobjectParticle.class);
         for (int i = 0; i < swarmSize; i++) { //Epochs
-            for (Particle particle : swarm.getAgents()) {
+            for (MultiobjectParticle particle : swarm.getAgents()) {
                 if (particle.evaluate(particle.getPos()) < particle.evaluate(particle.getPbest())) {
                     double[] pbest = particle.getPos();
                     particle.setPbest(pbest);
@@ -50,6 +56,40 @@ public class MultiobjectParticleSwarmOptimization implements OptimizationStrateg
                 particle.calcPos(particle.getPos(), particle.getVelo());
             }
         }
+    }
+
+    public List<Double> updateParetoFront(List<Double> paretoFront, double candidate) {
+        for(double archive : paretoFront) {
+            if(this.doesDominate(archive, candidate)) {
+                return paretoFront;
+            }
+            else if(this.doesDominate(candidate, archive)) {
+                paretoFront.remove(archive);
+            }
+        }
+        paretoFront.add(candidate);
+        return paretoFront;
+    }
+
+    /**
+     * Evaluates if found optima are dominating the optimal from the archive. It is required to
+     * bring both the optima on the equal target, so to speak, you need to minimize both or not.
+     *
+     * @param archive The archived the best solutions so far, based on the number of Objective Functions
+     * @param candidate A new candidate to give the best solution so far
+     * @return true if the new Solution does dominate
+     */
+    public boolean doesDominate(double archive, double candidate) {
+        boolean doesDominant = false;
+        boolean isStrictlySmaller = false;
+
+            if (candidate <= archive) {
+                doesDominant = true;
+            }
+            if (candidate < archive) {
+                isStrictlySmaller = true;
+            }
+        return doesDominant && isStrictlySmaller;
     }
 
     /**

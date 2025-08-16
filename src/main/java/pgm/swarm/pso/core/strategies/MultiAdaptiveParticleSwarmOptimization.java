@@ -9,6 +9,7 @@ import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
+import pgm.swarm.pso.core.decorators.MultiAdaptiveParticle;
 import pgm.visualization.VisualizationStrategy;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 @Log4j2
 @AllArgsConstructor
 @NoArgsConstructor
-public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrategy {
+public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrategy<MultiAdaptiveParticle> {
     protected VisualizationStrategy visualizationStrategy;
 
     /**
@@ -30,7 +31,7 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
      * @param startPositionAtY The initial y-coordinate of the swarm.
      * @param swarmSize The number of particles in the swarm, which also determines the number of iterations.
      */
-    public void optimize(Swarm<Particle> swarm, double startPositionAtX, double startPositionAtY, int swarmSize) {
+    public void optimize(Swarm<MultiAdaptiveParticle> swarm, double startPositionAtX, double startPositionAtY, int swarmSize) {
 
     }
 
