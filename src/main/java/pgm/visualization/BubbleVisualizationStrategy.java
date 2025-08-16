@@ -9,29 +9,29 @@ public class BubbleVisualizationStrategy implements VisualizationStrategy{
 	
 	@Override
 	public void visualize(ArrayList<Particle> particles, int dimension) {
-		bubbleChart = new BubbleChart("Particle Swarm Optimization", "Task", "VM", dimension);
-
-      int k = 0;
-      for(Particle particle : particles) {
-    	  bubbleChart.addBubble("Particle " + k, particle.getPos()[0], particle.getPos()[1]);
-      	k++;
-      }
-      bubbleChart.display();	
+//		bubbleChart = new BubbleChart("Particle Swarm Optimization", "Task", "VM", dimension);
+//
+//      int k = 0;
+//      for(Particle particle : particles) {
+//    	  bubbleChart.addBubble("Particle" + k, particle.getPosition()[0], particle.getPosition()[1]);
+//      	k++;
+//      }
+//      bubbleChart.display();
 	}
 
 	@Override
 	public void updateAndVisualize(ArrayList<Particle> particles) {
-      int z = 0;
-      for(Particle particle : particles) {
-      	
-      	try {
-  			Thread.sleep(60);
-  		} catch (InterruptedException e) {
-  			e.printStackTrace();
-  		}
-      	bubbleChart.updateBubble("Particle " + z, particle.getPos()[0], particle.getPos()[1]);
-      	z++;
-      }
+//      int z = 0;
+//      for(Particle particle : particles) {
+//
+//      	try {
+//  			Thread.sleep(60);
+//  		} catch (InterruptedException e) {
+//  			e.printStackTrace();
+//  		}
+//      	bubbleChart.updateBubble("Particle " + z, particle.getPosition()[0], particle.getPosition()[1]);
+//      	z++;
+//      }
 	}
 	
 	

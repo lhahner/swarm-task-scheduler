@@ -49,19 +49,22 @@ public class Evaluation {
      * @param cloudVms The list of available VMs.
      * @return The calculated makespan value (lower is better). Returns a high default value if the assignment is invalid.
      */
-    public double evaluateMakespan(double[] currentPosition, ArrayList<CloudletSimple> cloudTasks, ArrayList<Vm> cloudVms){
-        if (Math.abs((int) Math.round(currentPosition[0])) >= cloudVms.size() ||
-                Math.abs((int) Math.round(currentPosition[1])) >= cloudTasks.size()) {
+    public double evaluateMakespan(List<Double> currentPosition, ArrayList<CloudletSimple> cloudTasks, ArrayList<Vm> cloudVms){
+        if (Math.abs((int) Math.round(currentPosition.stream().mapToDouble(Double::doubleValue).sum())) >= cloudVms.size()
+        || Math.abs((int) Math.round(currentPosition.stream().mapToDouble(Double::doubleValue).sum())) >= cloudTasks.size()) {
             return 10.0;
         }
-        Vm vm = cloudVms.get(Math.abs((int) Math.round(currentPosition[0])));
-        Cloudlet task = cloudTasks.get(Math.abs((int) Math.round(currentPosition[1])));
+        Vm vm;
+        Cloudlet task;
         double makespan = 0;
-
-        if (vm.isSuitableForCloudlet(task)) {
-            makespan = task.getLength() / (vm.getMips() * vm.getFreePesNumber());
-        } else {
-            return 10.0;
+        for(int i = 0; i < cloudTasks.size(); i++) {
+            vm = cloudVms.get((Math.abs((int)(Math.round(currentPosition.get(i))))));
+            task = cloudTasks.get(Math.abs((int) Math.round(currentPosition.get(i))));
+            if (vm.isSuitableForCloudlet(task)) {
+                makespan = makespan + (task.getLength() / (vm.getMips() * vm.getFreePesNumber()));
+            } else {
+                return 10.0;
+            }
         }
         return makespan;
     }

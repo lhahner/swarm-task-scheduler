@@ -13,6 +13,7 @@ import pgm.swarm.pso.core.decorators.MultiAdaptiveParticle;
 import pgm.visualization.VisualizationStrategy;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -27,31 +28,10 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
      * This is domain independent.
      *
      * @param swarm The swarm to be optimized.
-     * @param startPositionAtX The initial x-coordinate of the swarm.
-     * @param startPositionAtY The initial y-coordinate of the swarm.
      * @param swarmSize The number of particles in the swarm, which also determines the number of iterations.
      */
-    public void optimize(Swarm<MultiAdaptiveParticle> swarm, double startPositionAtX, double startPositionAtY, int swarmSize) {
+    public void optimize(Swarm<Particle> swarm, List<Double> position, List<Double> velocity, int swarmSize) {
 
-    }
-
-    /**
-     * This method will check if the position of the particle is too large to be in the scope
-     * of the provided VMs and provided Tasks and afterward will set the position of the particles
-     * to random.
-     *
-     * @param particle The particle which should be checked and changed.
-     * @param vmList The List of VMs used.
-     * @param taskList The List of Tasks used
-     */
-    protected void resetParticlesOutOfRange(Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
-        int scalingFactor = taskList.size() > vmList.size() ? taskList.size() : vmList.size();
-        if (particle.getPos()[0] >= vmList.size()) {
-            particle.setPosX(Math.random() * scalingFactor);
-        }
-        if (particle.getPos()[1] >= taskList.size()) {
-            particle.setPosY(Math.random() * scalingFactor);
-        }
     }
 
     /**

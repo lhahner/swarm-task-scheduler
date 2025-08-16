@@ -1,57 +1,70 @@
 package pgm.swarm;
 
+import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import pgm.swarm.aco.core.Ant;
 import pgm.swarm.pso.core.Particle;
+import pgm.swarm.pso.core.decorators.AgingLeaderParticle;
+import pgm.swarm.pso.core.decorators.MultiAdaptiveParticle;
+import pgm.swarm.pso.core.decorators.MultiobjectParticle;
 
 /**
- * This factory will generate the Agents necessary for a
- * Swarm. So whenever a swarm is made up, this method
- * should be called to produce a swarm upon the required
- * agents.
- * 
+ * Factory for generating agents necessary for a swarm.
+ *
+ * <p>Whenever a swarm is created, this factory should be called to produce the required agents.
+ *
  * @author Lennart Hahner
  * @version 1.1.0
  */
-public class SwarmFactory <T> {
-	
+public class SwarmFactory<T> {
+
 	/**
-	 * This method is especially used to create
-	 * an Agent of the type particle, in the current
+	 * Creates a new {@link Particle} agent with the given position and velocity.
 	 *
-	 * @param positionAtX,positionAtY initial position of the Agent/Particle.
-	 * @param velocityAtX, the initial velocity of the Agent/Particle.
-	 * @return a new Particle.
+	 * @param position the initial position of the agent
+	 * @param velocity the initial velocity of the agent
+	 * @return a new {@link Particle}
+	 * @throws IllegalArgumentException if {@code position} and {@code velocity} have different sizes
 	 */
-	public Agent getAgent(double positionAtX, double positionAtY, double velocityAtX, double velocityAtY) {
-		if((positionAtX >= 0 && positionAtY >= 0) && (velocityAtX >= 0 && velocityAtY >= 0)) {
-			Particle particle = new Particle();
-			particle.setPos(positionAtX, positionAtY);
-			particle.setVelo(velocityAtX, velocityAtY);
-			return particle;
+	public Agent getAgent(@NotNull List<Double> position, @NotNull List<Double> velocity) {
+		if (position.size() != velocity.size()) {
+			throw new IllegalArgumentException("position and velocity sizes don't match");
 		}
-		throw new IllegalArgumentException("position or velocity are invalid");
+		Particle particle = new Particle();
+		particle.setPosition(position);
+		particle.setVelocity(velocity);
+		return particle;
 	}
-	
+
 	/**
-	 * Of using the String as an identifier for a certain
-	 * Agent. This method will produce the agent based upon
-	 * which swarm is required. It is returning the
-	 * required object after providing the string.
-	 * For example, if "Particle" is given as input,
-	 * the method will return a particle.
-	 * 
-	 * @param agentType the agent type like, ant, bee or particle.
-	 * @return the object for the required particle.
+	 * Creates a new agent of the given type with the specified position and velocity.
+	 *
+	 * <p>The type is identified by the {@code agentType} parameter. For example, if
+	 * {@code Particle.class} is passed, this method will return a {@link Particle}.
+	 *
+	 * @param position the initial position of the agent
+	 * @param velocity the initial velocity of the agent
+	 * @param agentType the class type of the agent (e.g., {@link Particle}, {@link Ant})
+	 * @return the created agent
+	 * @throws UnsupportedOperationException if the requested agent type is not yet implemented
+	 * @throws IllegalArgumentException if the given agent type is not supported
 	 */
-	public Agent getAgent(Class<T> agentType) {
-		if(agentType.equals(Particle.class)) {
-			return new Particle();
+	public Agent getAgent(
+			@NotNull List<Double> position, @NotNull List<Double> velocity, Class<T> agentType) {
+		if (agentType.equals(Particle.class)) {
+			Particle particle = new Particle();
+			particle.setPosition(position);
+			particle.setVelocity(velocity);
+			return particle;
+		} else if (agentType.equals(MultiobjectParticle.class)) {
+			throw new UnsupportedOperationException("MultiobjectParticle not yet implemented");
+		} else if (agentType.equals(MultiAdaptiveParticle.class)) {
+			throw new UnsupportedOperationException("MultiAdaptiveParticle not yet implemented");
+		} else if (agentType.equals(AgingLeaderParticle.class)) {
+			throw new UnsupportedOperationException("AgingLeaderParticle not yet implemented");
+		} else if (agentType.equals(Ant.class)) {
+			throw new UnsupportedOperationException("Ant not yet implemented");
 		}
-		else if(agentType.equals(Ant.class)) {
-			return new Ant();
-		}
-		else {
-			throw new IllegalArgumentException("Agent type not supported");
-		}
+		throw new IllegalArgumentException("Agent type not supported");
 	}
 }

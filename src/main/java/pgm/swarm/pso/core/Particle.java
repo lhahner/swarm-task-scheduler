@@ -1,178 +1,160 @@
 package pgm.swarm.pso.core;
 
+import java.util.List;
+import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import pgm.swarm.Agent;
 
-import java.util.Arrays;
-import java.util.concurrent.ThreadLocalRandom;
-
-/** 
- * Particle which is part of the Particle-Swarm-Optimization 
- * algorithm. This version of the Particle implements a two-dimensional
- * Array for representing the position of the Ant.
+/**
+ * Represents a particle in the Particle Swarm Optimization (PSO) algorithm.
  *
- * @version 1.0.0
- * @author Lennart Hahner
+ * <p>Each particle has a position and a velocity in the search space. It remembers its own best
+ * position found so far and adjusts its movement based on three components:
+ *
+ * <ul>
+ *   <li><b>Inertia</b> – momentum from its previous velocity
+ *   <li><b>Cognitive learning</b> – attraction towards its own best-known position
+ *   <li><b>Social learning</b> – attraction towards the global best position found by the swarm
+ * </ul>
+ *
+ * <p>This implementation models the particle’s state as lists of doubles.
  */
 @Setter
 @Getter
 @Log4j2
-public class Particle implements Agent{
+public class Particle implements Agent {
 
-	private int seed = ThreadLocalRandom.current().nextInt(10, 100 + 1);
+    /** Lower bound for random initialization of inertia weight. */
+    protected static final double INERTIA_WEIGHT_START_RANGE = 0.9;
 
-	/**
-	 * Stores the current position of the particle.
-	 */
-	private double[] pos = new double[2];
-	
-	/**
-	 * stores the current velocity of the particle. 
-	 */
-	private double[] velo = new double[2];
+    /** Upper bound for random initialization of inertia weight. */
+    protected static final double INERTIA_WEIGHT_END_RANGE = 1.2;
 
-	/**
-	 * Inertia weight factor that scales the influence of the previous velocity.
-	 * Helps balance exploration (global search) and exploitation (local refinement).
-	 */
-	private double inertiaWeight;
+    /**
+     * Cognitive learning factor (c1).
+     *
+     * <p>Controls the particle’s tendency to move towards its personal best position.
+     */
+    protected static final double COGNITIVE_LEARNING_FACTOR = 2.0;
 
-	/**
-	 * Constants defining the range within which the inertia weight is initialized.
-	 */
-	private final static double START_RANGE = 0.9;
-	private final static double END_RANGE = 1.2;
+    /**
+     * Social learning factor (c2).
+     *
+     * <p>Controls the particle’s tendency to move towards the global best position.
+     */
+    protected static final double SOCIAL_LEARNING_FACTOR = 2.0;
 
-	/**
-	 * local best values
-	 */
-	private double[] pbest = {10, 10};
+    /** Initial boundary value used to initialize the particle’s personal best. */
+    protected static final double UPPER_STARTING_BOUNDARY = 100;
 
-	/**
-	 * Default constructor.
-	 * Initializes the particle with a randomly generated inertia weight within the defined range.
-	 */
-	public Particle() {
-		this.setInertiaWeight(this.calculateInertiaWeight(START_RANGE, END_RANGE));
-	}
-	
-	/**
-	 * Sets the current position of the particle.
-	 * 
-	 * @param the new position
-	 */
-	public void setPos(double x, double y) {
-		this.pos[0] = x;
-		this.pos[1] = y;
-	}
-	
-	/**
-	 * Set the current velocity of the particle.
-	 * 
-	 * @param the new velocity
-	 */
-	public void setVelo(double velo_x, double velo_y) {
-		this.velo[0] = velo_x;
-		this.velo[1] = velo_y;
-	}
-	
-	/**
-	 * Set the x coordinate
-	 * @param x the value
-	 */
-	public void setPosX(double x) {
-		this.pos[0] = x;
-	}
-	
-	/**
-	 * Set the y coordinate
-	 * @param y the value
-	 */
-	public void setPosY(double y) {
-		this.pos[1] = y;
-	}
-	
-	/**
-	 * Set the current position by adding the velocity
-	 * 
-	 * @param cur_pos The initial position of the particle.
-	 * @param new_velo The new velocity upon it will change its position.
-	 */
-	public void calcPos(double[] cur_pos, double[] new_velo) {
-		for(int i = 0; i<this.pos.length;i++) {
-			this.pos[i] = cur_pos[i] + new_velo[i];
-		}
-	}
-	
-	/**
-	 * Calculates and gets the new velocity assigned to the particle.
-	 * 
-	 * @param cur_velo current velocity of the particle.
-	 * @param c_1 constant for weighting the values.
-	 * @param pos_best possible local best position.
-	 * @param pos current position of the particle.
-	 * @param c_2 constant for weighting the values.
-	 * @param global_best possible global best position. 
-	 */
-	public void calculateVelocity(double[] cur_velo, double c_1, double[] pos_best, double[] pos, double c_2, double[] global_best, double r_1, double r_2) {
-		if (cur_velo.length != pos.length || pos.length != pos_best.length || pos.length != global_best.length) {
-			throw new IllegalArgumentException("All input arrays must have the same length");
-		}
-		this.setVelo(
-				(inertiaWeight * cur_velo[0] + c_1 * r_1 * (pos_best[0] - pos[0]) + c_2 * r_2 * (global_best[0] - pos[0])),
-				(inertiaWeight * cur_velo[1] + c_1 * r_1 * (pos_best[1] - pos[1]) + c_2 * r_2 * (global_best[1] - pos[1]))
-		);
-		log.info("Ran calculateVelocity() in class ParticleModified, calculated: {}", Arrays.toString(this.getVelo()));
-	}
-	
-	/**
-	 * Converts the Object values to a String.
-	 * 
-	 * @return The Object as a String with its values.
-	 */
-	@Override
-	public String toString() {
-		return "Particle{position=" + this.pos[0] + "," + this.pos[1] + ",velocity=" + this.velo[0] + "," + this.velo[1] + 
-			    ",pbest=" + this.pbest[0] + "," + this.pbest[1] + "} \n";
-	}
+    /** Current position of the particle in the search space. */
+    private List<Double> position;
 
-	/**
-	 * Sets the values for pbest.
-	 * 
-	 * @param x The value on the x-axis.
-	 * @param y The value on the y-axis.
-	 */
-	public void setPbest(double[] pbest) {
-		System.arraycopy(pbest, 0, this.pbest, 0, this.pbest.length);;
-	}
-	
-	/**
-	 * Example of a fitness function. The smaller the returned value, the better.
-	 * 
-	 * @param positions the current positions of the particle
-	 * @return the new positions
-	 */
-	public double evaluate(double[] positions) {
+    /** Current velocity of the particle in the search space. */
+    private List<Double> velocity;
 
-		double fitness = 0.0;
-		for (double pos : positions) {
-			fitness += pos * pos;
-		}
-		return fitness;
-	}
+    /**
+     * Inertia weight factor that scales the previous velocity.
+     *
+     * <p>Higher values encourage exploration of the search space, while lower values encourage
+     * exploitation around known good solutions.
+     */
+    protected double inertiaWeight;
 
-	/**
-	 * Randomly generates an inertia weight within a specified range.
-	 * This randomness can help promote diversity in the swarm's behavior,
-	 * balancing between global exploration and local exploitation.
-	 *
-	 * @param min Lower bound of inertia weight.
-	 * @param max   Upper bound of inertia weight.
-	 * @return A random inertia weight within [min, end_range].
-	 */
-	public double calculateInertiaWeight(double min, double max) {
-		return ((Math.random() * (max - min)) + min);
-	}
+    /** Best position found so far by this particle (personal best). */
+    private List<Double> particlesBest =
+            List.of(UPPER_STARTING_BOUNDARY, UPPER_STARTING_BOUNDARY);
+
+    /**
+     * Constructs a new particle with a randomly generated inertia weight within the predefined range.
+     */
+    public Particle() {
+        this.setInertiaWeight(
+                this.calculateInertiaWeight(INERTIA_WEIGHT_START_RANGE, INERTIA_WEIGHT_END_RANGE));
+    }
+
+    /**
+     * Updates the particle’s position by adding the velocity vector to it.
+     *
+     * @param currentPosition the current position of the particle
+     * @param velocity the velocity vector to apply
+     * @throws IllegalArgumentException if {@code currentPosition} and {@code particlesBest} have
+     *     different dimensions
+     */
+    public void calculateNewPosition(List<Double> currentPosition, List<Double> velocity) {
+        if (currentPosition.size() != particlesBest.size()) {
+            throw new IllegalArgumentException("currentPosition.size() != particlesBest.size()");
+        }
+        IntStream.range(0, particlesBest.size())
+                .forEach(i -> currentPosition.set(i, currentPosition.get(i) + velocity.get(i)));
+    }
+
+    /**
+     * Updates the particle’s velocity using the standard PSO update rule:
+     *
+     * <pre>
+     * v(t+1) = inertia * v(t)
+     *        + c1 * rand() * (personalBest - position)
+     *        + c2 * rand() * (globalBest - position)
+     * </pre>
+     *
+     * @param velocity the current velocity (modified in place)
+     * @param particlesBest the particle’s personal best position
+     * @param position the particle’s current position
+     * @param globalBest the global best position found by the swarm
+     * @throws IllegalArgumentException if the input lists do not all have the same dimension
+     */
+    public void calculateVelocity(
+            List<Double> velocity,
+            List<Double> particlesBest,
+            List<Double> position,
+            List<Double> globalBest) {
+        if (velocity.size() != position.size()
+                || position.size() != particlesBest.size()
+                || position.size() != globalBest.size()) {
+            throw new IllegalArgumentException("All input arrays must have the same length");
+        }
+        for (int i = 0; i < velocity.size(); i++) {
+            velocity.set(
+                    i,
+                    (inertiaWeight * velocity.get(i))
+                            + (COGNITIVE_LEARNING_FACTOR
+                            * Math.random()
+                            * (particlesBest.get(i) - position.get(i)))
+                            + (SOCIAL_LEARNING_FACTOR
+                            * Math.random()
+                            * (globalBest.get(i) - position.get(i))));
+        }
+        log.info("Ran calculateVelocity() in class Particle, calculated: {}", List.of(velocity));
+    }
+
+    /**
+     * Returns a string representation of the particle, including its position, velocity, inertia
+     * weight, and personal best.
+     *
+     * @return a formatted string representation of the particle
+     */
+    @Override
+    public String toString() {
+        return "Particle{"
+                + "position=" + position
+                + ", velocity=" + velocity
+                + ", inertiaWeight=" + inertiaWeight
+                + ", particlesBest=" + particlesBest
+                + "} \n";
+    }
+
+    /**
+     * Generates a random inertia weight within the given range. The randomness helps diversify the
+     * swarm’s behavior by balancing exploration and exploitation.
+     *
+     * @param min the lower bound of the inertia weight
+     * @param max the upper bound of the inertia weight
+     * @return a random inertia weight within the range {@code [min, max]}
+     */
+    public double calculateInertiaWeight(double min, double max) {
+        return ((Math.random() * (max - min)) + min);
+    }
 }

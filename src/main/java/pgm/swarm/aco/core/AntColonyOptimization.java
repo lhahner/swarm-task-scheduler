@@ -20,33 +20,34 @@ public class AntColonyOptimization {
 	  * @param ants swarm of ants 
 	  * @param graph a graph to optimize
 	  */
-	 public double optimize(Swarm<Ant> ants, double[][][] graph) {
-		int i = 0,j = 0;
-		
-		ArrayList<Integer> edge = new ArrayList<Integer>();
-		edge.add(0);
-		edge.add(0);
-		
-		for(int k=0;k<200;k++) {
-		 for(Ant ant : ants.getAgents()) {
-			  do {
-				  ant.addToTrail(edge.get(0), edge.get(1));
-				  
-				 ant.calcPossibleNextVisit(i, graph[i]);
-				 graph[i][ant.getPos()][1] = ant.updatePheronome(graph[i][j][1], 2);
-				 
-				 if(ants.getGlobalBest() > graph[i][ant.getPos()][0]) {
-					 ants.setGlobalbest(graph[i][ant.getPos()][0]);
-				 }
-				 
-				 edge.set(0, i);
-				 edge.set(1, ant.getPos());
-				 i = ant.getPos(); 
-				 
-			 } while(!ant.getTrail().contains(edge));
-			 ant.clearTrail();
-		 }
-		}
-		return ants.getGlobalBest();
-	 }
+//	 public double optimize(Swarm<Ant> ants, double[][][] graph) {
+////		int i = 0,j = 0;
+////
+////		ArrayList<Integer> edge = new ArrayList<Integer>();
+////		edge.add(0);
+////		edge.add(0);
+////
+////		for(int k=0;k<200;k++) {
+////		 for(Ant ant : ants.getAgents()) {
+////			  do {
+////				  ant.addToTrail(edge.get(0), edge.get(1));
+////
+////				 ant.calcPossibleNextVisit(i, graph[i]);
+////				 graph[i][ant.getPos()][1] = ant.updatePheronome(graph[i][j][1], 2);
+////
+////				 if(ants.getGlobalBest() > graph[i][ant.getPos()][0]) {
+////					 ants.setGlobalbest(graph[i][ant.getPos()][0]);
+////				 }
+////
+////				 edge.set(0, i);
+////				 edge.set(1, ant.getPos());
+////				 i = ant.getPos();
+////
+////			 } while(!ant.getTrail().contains(edge));
+////			 ant.clearTrail();
+////		 }
+////		}
+////		return ants.getGlobalBest();
+////	 }
+//	 }
 }

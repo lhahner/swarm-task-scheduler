@@ -1,83 +1,100 @@
 package pgm.swarm.pso.core.strategies;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
+import pgm.swarm.pso.core.evaluations.Evaluation;
 import pgm.visualization.VisualizationStrategy;
-
-import java.util.ArrayList;
 
 /**
  * Class for performing Particle Swarm Optimization (PSO) on different problems.
- * This class makes use of the Particle Swarm and performs domain-specific or Domain independent * optimization.
  *
- * @version 1.7.0
- * @author lennart.hahner
+ * <p>This class makes use of the Particle Swarm and performs domain-specific or domain-independent
+ * optimization.
  */
 @Setter
 @Getter
 @Log4j2
+@AllArgsConstructor
 public class ParticleSwarmOptimization implements OptimizationStrategy<Particle> {
 
     protected VisualizationStrategy visualizationStrategy;
+    protected Evaluation evaluation;
+    private ArrayList<CloudletSimple> cloudTasks;
+    private ArrayList<Vm> cloudVms;
 
     /**
      * Optimizes a given swarm starting from a specified position over a defined number of iterations.
      * This is domain independent.
      *
-     * @param swarm The swarm to be optimized.
-     * @param startPositionAtX The initial x-coordinate of the swarm.
-     * @param startPositionAtY The initial y-coordinate of the swarm.
-     * @param swarmSize The number of particles in the swarm, which also determines the number of iterations.
+     * @param swarm the swarm to be optimized
+     * @param position the starting position for the particles
+     * @param velocity the starting velocity for the particles
+     * @param swarmSize the number of particles in the swarm, which also determines the number of
+     *     iterations
      */
-    public void optimize(Swarm<Particle> swarm, double startPositionAtX, double startPositionAtY, int swarmSize) {
-        swarm = new Swarm<Particle>(startPositionAtX, startPositionAtY, swarmSize, Particle.class);
+    public void optimize(
+            Swarm<Particle> swarm, List<Double> position, List<Double> velocity, int swarmSize) {
+        swarm = new Swarm<>(position, velocity, swarmSize, Particle.class);
         for (int i = 0; i < swarmSize; i++) {
             for (Particle particle : swarm.getAgents()) {
-                if (particle.evaluate(particle.getPos()) < particle.evaluate(particle.getPbest())) {
-                    double[] pbest = particle.getPos();
-                    particle.setPbest(pbest);
+                if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
+                        < evaluation.evaluateMakespan(particle.getParticlesBest(), cloudTasks, cloudVms)) {
+                    List<Double> newParticlesBest = particle.getPosition();
+                    particle.setParticlesBest(newParticlesBest);
                 }
-                if (particle.evaluate(particle.getPos()) < particle.evaluate(swarm.getGlobalBests())) {
-                    swarm.setGlobalBests(particle.getPos());
+                if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
+                        < evaluation.evaluateMakespan(swarm.getGlobalBests(), cloudTasks, cloudVms)) {
+                    swarm.setGlobalBests(particle.getPosition());
                 }
-                particle.calculateVelocity(particle.getVelo(), 2, particle.getPbest(), particle.getPos(), 2, swarm.getGlobalBests(),
-                        Math.random(), Math.random());
-                particle.calcPos(particle.getPos(), particle.getVelo());
+                particle.calculateVelocity(
+                        particle.getVelocity(),
+                        particle.getParticlesBest(),
+                        particle.getPosition(),
+                        swarm.getGlobalBests());
+                particle.calculateNewPosition(particle.getPosition(), particle.getVelocity());
             }
         }
     }
 
     /**
-     * This method will check if the position of the particle is too large to be in the scope
-     * of the provided VMs and provided Tasks and afterward will set the position of the particles
-     * to random.
+     * Checks if the position of the particle is too large to be in the scope of the provided VMs and
+     * tasks. If so, reset the particle’s position randomly within the valid range.
      *
-     * @param particle The particle which should be checked and changed.
-     * @param vmList The List of VMs used.
-     * @param taskList The List of Tasks used
+     * @param particle the particle to be checked and potentially reset
+     * @param vmList the list of VMs used
+     * @param taskList the list of tasks used
      */
-    protected void resetParticlesOutOfRange(Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
-        int scalingFactor = taskList.size() > vmList.size() ? taskList.size() : vmList.size();
-        if (particle.getPos()[0] >= vmList.size()) {
-            particle.setPosX(Math.random() * scalingFactor);
-        }
-        if (particle.getPos()[1] >= taskList.size()) {
-            particle.setPosY(Math.random() * scalingFactor);
-        }
+    protected void resetParticlesOutOfRange(
+            Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
+        int scalingFactor = Math.max(taskList.size(), vmList.size());
+
+        IntStream.range(0, particle.getPosition().size()).forEach(i -> {
+            if (particle.getPosition().get(i) >= vmList.size()
+                    || particle.getPosition().get(i) >= taskList.size()){
+                particle.getPosition().set(i, Math.random() * scalingFactor);
+            }
+        });
     }
 
     /**
-     * Should provide and assign a Visualization strategy specified for the PSO algorithm.
+     * Provides and assigns a visualization strategy specified for the PSO algorithm.
      *
-     * @param visualizationStrategy the strategy to be performed for the current use-case
-     * @return the strategy to be performed for the current use-case
+     * @param visualizationStrategy the strategy to be performed for the current use case
+     * @return the visualization strategy set for this instance
      */
-    protected VisualizationStrategy setAndGetVisualizationStrategy(VisualizationStrategy visualizationStrategy) {
+    protected VisualizationStrategy setAndGetVisualizationStrategy(
+            VisualizationStrategy visualizationStrategy) {
         this.visualizationStrategy = visualizationStrategy;
         return this.visualizationStrategy;
     }
