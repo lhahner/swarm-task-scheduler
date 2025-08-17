@@ -3,6 +3,7 @@ package pgm.swarm.pso.core.evaluations;
 import org.cloudsimplus.cloudlets.Cloudlet;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
+import org.cloudsimplus.vms.VmSimple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,9 @@ import java.util.stream.DoubleStream;
  * Implements diverse types of evaluations functions to use.
  */
 public class Evaluation {
+    /* Will provide the end result of the evaluation */
+    private double objective;
+
     /**
      * The lower value of this criterion means that the
      * algorithm has been able to distribute the load better. Load balancing
@@ -82,16 +86,30 @@ public class Evaluation {
     }
 
     /**
-     * Calculates the task execution time for a task on a VM.
-     * If summed up for all tasks on a VM results in total task execution time.
+     * Evaluates the time tasks need to execute by calculating the execution time for a given task-VM assignment. Here
+     * we are minimizing.
      *
-     * @param taskAmountData The amount of data that task i assigns to the VM k
-     * @param vmAmountMemory The amount of memory of VM k
-     * @param vmAmountCapacity The amount of capacity of VM k
-     * @return Task Execution tim on VM
+     * @param currentPosition The position of the particle representing a task-VM mapping.
+     * @param cloudTasks The list of cloudTasks to be scheduled.
+     * @param cloudVms The list of available VMs.
+     * @return The calculated makespan value (lower is better). Returns a high default value if the assignment is invalid.
      */
-    public double taskExecutionTime(double taskAmountData, double vmAmountMemory, double vmAmountCapacity){
-        return taskAmountData/(vmAmountMemory*vmAmountCapacity);
+    public double taskExecutionTime(List<Double> currentPosition, ArrayList<CloudletSimple> cloudTasks, ArrayList<Vm> cloudVms){
+        if (Math.abs((int) Math.round(currentPosition.stream().mapToDouble(Double::doubleValue).sum())) >= cloudVms.size()
+                || Math.abs((int) Math.round(currentPosition.stream().mapToDouble(Double::doubleValue).sum())) >= cloudTasks.size()) {
+            return 10.0;
+        }
+        double executionTime=0;
+        for(int i = 0; i < cloudTasks.size(); i++) {
+            Vm vm = cloudVms.get((Math.abs((int)(Math.round(currentPosition.get(i))))));
+            Cloudlet task = cloudTasks.get(Math.abs((int) Math.round(currentPosition.get(i))));
+            if (vm.isSuitableForCloudlet(task)) {
+                executionTime = executionTime + (double) task.getLength() /(vm.getRam().getAllocatedResource()*vm.getRam().getCapacity());
+            } else {
+                return 10.0;
+            }
+        }
+        return executionTime;
     }
 
     /**

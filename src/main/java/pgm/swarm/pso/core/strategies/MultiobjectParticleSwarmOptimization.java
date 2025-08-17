@@ -1,7 +1,7 @@
 package pgm.swarm.pso.core.strategies;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +9,11 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
+import pgm.swarm.Agent;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
 import pgm.swarm.pso.core.decorators.MultiobjectParticle;
+import pgm.swarm.pso.core.evaluations.Evaluation;
 import pgm.visualization.VisualizationStrategy;
 
 /** Performs multi-objective Particle Swarm Optimization (PSO). */
@@ -23,10 +25,16 @@ import pgm.visualization.VisualizationStrategy;
 public class MultiobjectParticleSwarmOptimization
         implements OptimizationStrategy<MultiobjectParticle> {
 
-    /** Stores the set of all objective vectors corresponding to the Pareto-optimal solutions. */
-    private Map<Integer, Double> paretoFront;
+    private static final double SOLUTIONS_HEAD = 10;
 
+    /** Stores the set of all objective vectors corresponding to the Pareto-optimal solutions. */
+    private TreeMap<Double, List<Double>> paretoFront; // 1 Solution 2 Position
+    private List<Double> objectives;
+    private ArrayList<CloudletSimple> cloudTasks;
+    private ArrayList<Vm> cloudVms;
+    private double makespan, costs;
     protected VisualizationStrategy visualizationStrategy;
+    protected Evaluation evaluation;
 
     /**
      * Optimizes a given swarm starting from a specified position over a defined number of iterations.
@@ -39,7 +47,41 @@ public class MultiobjectParticleSwarmOptimization
      *     iterations
      */
     public void optimize(
-            Swarm<Particle> swarm, List<Double> position, List<Double> velocity, int swarmSize) {}
+            Swarm<MultiobjectParticle> swarm,
+            List<Double> position,
+            List<Double> velocity,
+            int swarmSize) {
+        swarm = new Swarm<MultiobjectParticle>(
+                        position, velocity, swarmSize, MultiobjectParticle.class);
+        for (int i = 0; i < swarmSize; i++) {
+            for (MultiobjectParticle particle : swarm.getAgents()) {
+                if (updateParetoFront(
+                        paretoFront,
+                        particle.getPosition(),
+                        evaluation.evaluateMakespan(
+                                particle.getPosition(), cloudTasks, cloudVms))
+                        || updateParetoFront(
+                        paretoFront,
+                        particle.getPosition(),
+                        evaluation.executionCosts(
+                                5,
+                                cloudVms.size(),
+                                evaluation.taskExecutionTime(
+                                        particle.getPosition(), cloudTasks, cloudVms)))) {
+                    particle.setParticlesBest(particle.getPosition());
+                    swarm.setGlobalBests(particle.getPosition());
+                }
+                swarm.setGlobalBests(getRandomOfBestTenSolution(paretoFront));
+                particle.calculateVelocity(
+                        particle.getVelocity(),
+                        particle.getParticlesBest(),
+                        particle.getPosition(),
+                        swarm.getGlobalBests());
+                particle.calculateNewPosition(
+                        particle.getPosition(), particle.getVelocity());
+            }
+        }
+    }
 
     /**
      * Updates the Pareto front with a new candidate solution.
@@ -48,22 +90,22 @@ public class MultiobjectParticleSwarmOptimization
      * @param candidate the new candidate solution
      * @return the updated Pareto front
      */
-    public List<Double> updateParetoFront(List<Double> paretoFront, double candidate) {
-        for (double archive : paretoFront) {
+    public boolean updateParetoFront(Map<Double, List<Double>> paretoFront, List<Double> candidatePosition, double candidate) {
+        double archive;
+        for (Map.Entry<Double, List<Double>> entry : paretoFront.entrySet()) {
+            archive = entry.getKey();
             if (this.doesDominate(archive, candidate)) {
-                return paretoFront;
+                return false;
             } else if (this.doesDominate(candidate, archive)) {
                 paretoFront.remove(archive);
             }
         }
-        paretoFront.add(candidate);
-        return paretoFront;
+        paretoFront.put(candidate, candidatePosition);
+        return true;
     }
 
     /**
      * Evaluates whether a candidate dominates a solution in the archive.
-     *
-     * <p>Both objectives must be minimized to be comparable.
      *
      * @param archive the archived solution (best found so far)
      * @param candidate the new candidate solution
@@ -82,7 +124,15 @@ public class MultiobjectParticleSwarmOptimization
         return doesDominant && isStrictlySmaller;
     }
 
+   public List<Double> getRandomOfBestTenSolution(Map<Double, List<Double>> paretoFront) {
+       if (paretoFront.size() < SOLUTIONS_HEAD) {
+           return paretoFront.get(new Random().nextDouble(paretoFront.size()));
+       }
+       return paretoFront.get(new Random().nextDouble(SOLUTIONS_HEAD));
+    }
+
     /**
+     *
      * Provides and assigns a visualization strategy specified for the PSO algorithm.
      *
      * @param visualizationStrategy the strategy to be performed for the current use case

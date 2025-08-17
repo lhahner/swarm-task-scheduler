@@ -121,17 +121,17 @@ public class VirtualMachineUtility {
     public double getVmProvidedResources(int index) {
         return this.vmlist.get(index).getMips() * this.vmlist.get(index).getPesNumber();
     }
-    
+
     /**
      * Prints statistics for all virtual machines.
      * Currently, it prints CPU utilization statistics.
      */
     @Override
     public String toString() {
-    	String vmStats = "";
-        for(Vm vm : this.vmlist) {
-        	vmStats = vmStats + "CPU % Utilization: " + vm.getHost().getCpuUtilizationStats().getMean() + "\n";
+        String vmStats = "";
+        for (Vm vm : this.vmlist) {
+            vmStats = vmStats + "CPU % Utilization: " + vm.getHost().getCpuUtilizationStats().getMean() + "\n";
         }
         return vmStats;
-    }	
+    }
 }

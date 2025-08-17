@@ -30,7 +30,7 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
      * @param swarm The swarm to be optimized.
      * @param swarmSize The number of particles in the swarm, which also determines the number of iterations.
      */
-    public void optimize(Swarm<Particle> swarm, List<Double> position, List<Double> velocity, int swarmSize) {
+    public void optimize(Swarm<MultiAdaptiveParticle> swarm, List<Double> position, List<Double> velocity, int swarmSize) {
 
     }
 

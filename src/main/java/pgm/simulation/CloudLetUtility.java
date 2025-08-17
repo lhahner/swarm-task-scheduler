@@ -1,6 +1,9 @@
 package pgm.simulation;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import org.cloudsimplus.cloudlets.Cloudlet;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 
 /**
@@ -77,4 +80,5 @@ public class CloudLetUtility {
         CloudletSimple cloudlet = cloudletList.get(index);
         return cloudlet.getLength() * cloudlet.getPesNumber();
     }
+
 }

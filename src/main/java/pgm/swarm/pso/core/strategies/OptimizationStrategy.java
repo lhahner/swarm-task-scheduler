@@ -6,5 +6,5 @@ import pgm.swarm.pso.core.Particle;
 import java.util.List;
 
 public interface OptimizationStrategy<T extends Agent> {
-    public void optimize(Swarm<Particle> swarm, List<Double> position, List<Double> velocity, int swarmSize);
+    public void optimize(Swarm<T> swarm, List<Double> position, List<Double> velocity, int swarmSize);
 }
