@@ -25,6 +25,9 @@ import pgm.visualization.VisualizationStrategy;
 public class MultiobjectParticleSwarmOptimization
         implements OptimizationStrategy<MultiobjectParticle> {
 
+    /**
+     * From which the particles best are selected.
+     */
     private static final double SOLUTIONS_HEAD = 10;
 
     /** Stores the set of all objective vectors corresponding to the Pareto-optimal solutions. */

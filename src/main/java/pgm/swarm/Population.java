@@ -1,11 +1,11 @@
 package pgm.swarm;
 
+import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
+import pgm.swarm.pso.core.decorators.MultiAdaptiveParticle;
 
 /**
  * A swarm population refers to the number of individuals in a swarm-based optimization algorithm,
@@ -21,14 +21,18 @@ import lombok.extern.log4j.Log4j2;
 @Setter
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Log4j2
 public class Population<T extends Agent> {
+
+    /* Particle in the center of the population */
+    private T center;
 
     /** Agents considered as part of the population. */
     private List<T> population;
 
     /** Position of the local best agent. */
-    private double[] localBest;
+    private List<Double> localBest;
 
     /**
      * Adds an agent to the population.
@@ -62,4 +66,5 @@ public class Population<T extends Agent> {
         log.info("Removed type {} Agent from the population", agent.getClass().toString());
         return agent;
     }
+
 }

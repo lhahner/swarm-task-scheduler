@@ -10,7 +10,9 @@ import pgm.swarm.pso.core.Particle;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Implementation is based on the Paper "An improved particle swarm
@@ -55,7 +57,7 @@ public class MultiAdaptiveParticle extends Particle {
                                         List<Double> position,
                                         List<Double> globalBest,
                                         int numberOfPopulations,
-                                        List<Population<Particle>> population) {
+                                        List<Population<MultiAdaptiveParticle>> population) {
         if (velocity.size() != position.size()
                 || position.size() != particlesBest.size()
                 || position.size() != globalBest.size()) {
@@ -81,15 +83,14 @@ public class MultiAdaptiveParticle extends Particle {
      * @param swarm The swarm in which the particle is part of.
      * @return The density calculated for the particle
      */
-    public double setLocalDensity(Swarm<Particle> swarm) {
+    public void setLocalDensity(Swarm<MultiAdaptiveParticle> swarm) {
         double localDensity = 0;
-        for (Particle particle : (ArrayList<Particle>) swarm.getAgents()) {
+        for (MultiAdaptiveParticle particle : swarm.getAgents()) {
             localDensity = localDensity + Math.exp(
                     (-1) * Math.pow((getDistance(particle) / this.getCutoffDistance(particle, CUTOFF)), 2)
             );
         }
         this.localDensity = localDensity;
-        return localDensity;
     }
 
     /**
@@ -99,10 +100,11 @@ public class MultiAdaptiveParticle extends Particle {
      * @param numberOfPopulations the number of populations which divide the swarm.
      * @return a float value which represents the average global best.
      */
-    public double calculateAverageGlobalBest(List<Population<Particle>> populations, int numberOfPopulations) {
+    public double calculateAverageGlobalBest(List<Population<MultiAdaptiveParticle>> populations, int numberOfPopulations) {
         List<Double> globalBests = new ArrayList<Double>();
-        for (Population<Particle> population : populations) {
-            globalBests.add(Arrays.stream(population.getLocalBest()).sum());
+        for (Population<MultiAdaptiveParticle> population : populations) {
+            globalBests.add(population.getLocalBest().stream().mapToDouble(Double::doubleValue).sum());
+
         }
         return globalBests.stream().mapToDouble(Double::doubleValue).sum() / numberOfPopulations;
     }
@@ -139,7 +141,7 @@ public class MultiAdaptiveParticle extends Particle {
      * @param particle the particle to which this should be measured to
      * @return the Euclidean distance
      */
-    public double getDistance(Particle particle) {
+    public double getDistance( Particle particle) {
         List<Double> p = this.getPosition();
         List<Double> q = particle.getPosition();
         if (p.size() != q.size()) throw new IllegalArgumentException("Dim mismatch");
