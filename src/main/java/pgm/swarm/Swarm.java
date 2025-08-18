@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
+import pgm.swarm.pso.core.Particle;
 
 /**
  * A social-behavior–based set of agents that move in an N-dimensional space to optimize toward a
@@ -69,6 +70,7 @@ public class Swarm<T extends Agent> implements Iterable<T> {
 		}
 		return sb.toString();
 	}
+
 
 	/** Makes swarm iterable. */
 	@Override
