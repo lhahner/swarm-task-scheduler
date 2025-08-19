@@ -2,6 +2,7 @@ package pgm.swarm.pso.core.decorators;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import pgm.swarm.Population;
@@ -25,6 +26,7 @@ import java.util.stream.Stream;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Log4j2
 public class MultiAdaptiveParticle extends Particle {
 
@@ -83,14 +85,21 @@ public class MultiAdaptiveParticle extends Particle {
      * @param swarm The swarm in which the particle is part of.
      * @return The density calculated for the particle
      */
-    public void setLocalDensity(Swarm<MultiAdaptiveParticle> swarm) {
-        double localDensity = 0;
-        for (MultiAdaptiveParticle particle : swarm.getAgents()) {
-            localDensity = localDensity + Math.exp(
-                    (-1) * Math.pow((getDistance(particle) / this.getCutoffDistance(particle, CUTOFF)), 2)
-            );
+    public void setLocalDensity(int index, Swarm<MultiAdaptiveParticle> swarm, double cutoffDistance) {
+        double dc = cutoffDistance > 0 ? cutoffDistance : 1e-12; // guard against zeros
+        double dc2 = dc * dc;
+
+        double rho = 0.0;
+        List<MultiAdaptiveParticle> agents = swarm.getAgents();
+
+        for (int i = 0; i < agents.size(); i++) {
+            if (i == index) continue;
+            double dij = this.getDistance(agents.get(i));
+            // Gaussian kernel with shared d_c
+            rho += Math.exp(-(dij * dij) / dc2);
         }
-        this.localDensity = localDensity;
+
+        this.localDensity = 1.0 + rho; // retain your +1 offset
     }
 
     /**
@@ -113,26 +122,33 @@ public class MultiAdaptiveParticle extends Particle {
      * Compute the cutoff distance based on given percentile of all
      * pairwise Euclidean distances between points.
      *
-     * @param particle   The particle to which we calculate the distance
      * @param percentile e.g.: 2.0 for the 2% cutoff
      * @return The computed cutoff distance d_c
      */
-    public double getCutoffDistance(Particle particle, double percentile) {
-        int n = particle.getPosition().size();
-        List<Double> distances = new ArrayList<>();
+    public static double computeCutoffDistance(Swarm<MultiAdaptiveParticle> swarm, double percentile) {
+        List<MultiAdaptiveParticle> agents = swarm.getAgents();
+        int n = agents.size();
+        if (n < 2) return 0.0;
 
+        List<Double> distances = new ArrayList<>(n * (n - 1) / 2);
         for (int i = 0; i < n; i++) {
+            MultiAdaptiveParticle a = agents.get(i);
             for (int j = i + 1; j < n; j++) {
-                double dist = this.getDistance(particle);
-                distances.add(dist);
+                MultiAdaptiveParticle b = agents.get(j);
+                distances.add(a.getDistance(b));
             }
         }
         Collections.sort(distances);
+        // Percentile index (ceil so 2% of N keeps something > 0 for small N)
+        int idx = (int) Math.ceil((percentile / 100.0) * distances.size()) - 1;
+        idx = Math.max(0, Math.min(idx, distances.size() - 1));
 
-        int index = (int) Math.floor((percentile / 100.0) * distances.size());
-        index = Math.max(0, Math.min(index, distances.size() - 1));
-
-        return distances.get(index);
+        double dc = distances.get(idx);
+        if (dc <= 0.0) {
+            // smallest strictly positive distance as fallback; else tiny epsilon
+            dc = distances.stream().filter(d -> d > 0).findFirst().orElse(1e-12);
+        }
+        return dc;
     }
 
     /**
@@ -149,6 +165,7 @@ public class MultiAdaptiveParticle extends Particle {
         double sumSq = IntStream.range(0, p.size())
                 .mapToDouble(i -> {
                     double d = p.get(i) - q.get(i);
+                    if(d == 0) return 1;
                     return d * d;
                 })
                 .sum();

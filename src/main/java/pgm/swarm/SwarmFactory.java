@@ -1,6 +1,9 @@
 package pgm.swarm;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.jetbrains.annotations.NotNull;
 import pgm.swarm.aco.core.Ant;
 import pgm.swarm.pso.core.Particle;
@@ -54,16 +57,33 @@ public class SwarmFactory<T> {
 		if (agentType.equals(Particle.class)) {
 			Particle particle = new Particle();
 			particle.setPosition(position);
+			particle.setParticlesBest(position);
 			particle.setVelocity(velocity);
 			return particle;
 		} else if (agentType.equals(MultiobjectParticle.class)) {
-			throw new UnsupportedOperationException("MultiobjectParticle not yet implemented");
+			MultiobjectParticle particle = new MultiobjectParticle();
+			particle.setPosition(position);
+			particle.setParticlesBest(position);
+			particle.setVelocity(velocity);
+			return particle;
 		} else if (agentType.equals(MultiAdaptiveParticle.class)) {
-			throw new UnsupportedOperationException("MultiAdaptiveParticle not yet implemented");
+			MultiAdaptiveParticle particle = new MultiAdaptiveParticle();
+			// Only here required because we compute the distance
+			List<Double> multiplied = position.stream()
+					.map(n -> n * Math.random())
+					.toList();
+			particle.setPosition(multiplied);
+			particle.setParticlesBest(position);
+			particle.setVelocity(velocity);
+			return particle;
 		} else if (agentType.equals(AgingLeaderParticle.class)) {
-			throw new UnsupportedOperationException("AgingLeaderParticle not yet implemented");
+			AgingLeaderParticle particle = new AgingLeaderParticle();
+			particle.setPosition(position);
+			particle.setParticlesBest(position);
+			particle.setVelocity(velocity);
+			return particle;
 		} else if (agentType.equals(Ant.class)) {
-			throw new UnsupportedOperationException("Ant not yet implemented");
+			Ant particle = new Ant();
 		}
 		throw new IllegalArgumentException("Agent type not supported");
 	}

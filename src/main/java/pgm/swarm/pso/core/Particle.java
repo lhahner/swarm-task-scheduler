@@ -1,5 +1,6 @@
 package pgm.swarm.pso.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.Getter;
@@ -47,7 +48,7 @@ public class Particle implements Agent {
     protected static final double SOCIAL_LEARNING_FACTOR = 2.0;
 
     /** Initial boundary value used to initialize the particle’s personal best. */
-    protected static final double UPPER_STARTING_BOUNDARY = 100;
+    protected static final double UPPER_STARTING_BOUNDARY = 10;
 
     /** Current position of the particle in the search space. */
     private List<Double> position;
@@ -64,8 +65,7 @@ public class Particle implements Agent {
     protected double inertiaWeight;
 
     /** Best position found so far by this particle (personal best). */
-    private List<Double> particlesBest =
-            List.of(UPPER_STARTING_BOUNDARY, UPPER_STARTING_BOUNDARY);
+    private List<Double> particlesBest;
 
     /**
      * Constructs a new particle with a randomly generated inertia weight within the predefined range.
@@ -87,8 +87,10 @@ public class Particle implements Agent {
         if (currentPosition.size() != particlesBest.size()) {
             throw new IllegalArgumentException("currentPosition.size() != particlesBest.size()");
         }
+        List<Double> newPosition = new ArrayList<>(currentPosition);
         IntStream.range(0, particlesBest.size())
-                .forEach(i -> currentPosition.set(i, currentPosition.get(i) + velocity.get(i)));
+                .forEach(i -> newPosition.set(i, currentPosition.get(i) + velocity.get(i)));
+        this.position = newPosition;
     }
 
     /**
@@ -111,13 +113,15 @@ public class Particle implements Agent {
             List<Double> particlesBest,
             List<Double> position,
             List<Double> globalBest) {
+        List<Double> newVelocity = new ArrayList<>(velocity);
         if (velocity.size() != position.size()
                 || position.size() != particlesBest.size()
                 || position.size() != globalBest.size()) {
             throw new IllegalArgumentException("All input arrays must have the same length");
         }
+
         for (int i = 0; i < velocity.size(); i++) {
-            velocity.set(
+            newVelocity.set(
                     i,
                     (inertiaWeight * velocity.get(i))
                             + (COGNITIVE_LEARNING_FACTOR
@@ -127,6 +131,7 @@ public class Particle implements Agent {
                             * Math.random()
                             * (globalBest.get(i) - position.get(i))));
         }
+        this.velocity = newVelocity;
         log.info("Ran calculateVelocity() in class Particle, calculated: {}", List.of(velocity));
     }
 

@@ -28,7 +28,7 @@ public class MultiobjectParticleSwarmOptimization
     /**
      * From which the particles best are selected.
      */
-    private static final double SOLUTIONS_HEAD = 10;
+    private static final int SOLUTIONS_HEAD = 10;
 
     /** Stores the set of all objective vectors corresponding to the Pareto-optimal solutions. */
     private TreeMap<Double, List<Double>> paretoFront; // 1 Solution 2 Position
@@ -37,24 +37,22 @@ public class MultiobjectParticleSwarmOptimization
     private ArrayList<Vm> cloudVms;
     private double makespan, costs;
     protected VisualizationStrategy visualizationStrategy;
-    protected Evaluation evaluation;
+    protected final Evaluation evaluation = new Evaluation();
 
     /**
      * Optimizes a given swarm starting from a specified position over a defined number of iterations.
      * This is domain independent.
      *
-     * @param swarm the swarm to be optimized
      * @param position the starting position for the particles
      * @param velocity the starting velocity for the particles
      * @param swarmSize the number of particles in the swarm, which also determines the number of
      *     iterations
      */
-    public void optimize(
-            Swarm<MultiobjectParticle> swarm,
+    public double optimize(
             List<Double> position,
             List<Double> velocity,
             int swarmSize) {
-        swarm = new Swarm<MultiobjectParticle>(
+        Swarm<MultiobjectParticle> swarm = new Swarm<MultiobjectParticle>(
                         position, velocity, swarmSize, MultiobjectParticle.class);
         for (int i = 0; i < swarmSize; i++) {
             for (MultiobjectParticle particle : swarm.getAgents()) {
@@ -84,54 +82,71 @@ public class MultiobjectParticleSwarmOptimization
                         particle.getPosition(), particle.getVelocity());
             }
         }
+        return swarm.getGlobalBest();
     }
 
     /**
-     * Updates the Pareto front with a new candidate solution.
+     * Attempts to update the given Pareto front with a new candidate solution.
      *
-     * @param paretoFront the current Pareto front
-     * @param candidate the new candidate solution
-     * @return the updated Pareto front
+     * <p>The method checks if the candidate dominates (i.e., is less than or equal to) any existing
+     * solution in the Pareto front. If the candidate is strictly better (strictly smaller than at least
+     * one existing solution), the dominated solution is removed and the candidate is added. If the
+     * candidate is only equal (not strictly smaller), it is added alongside existing solutions.
+     *
+     * @param paretoFront the current Pareto front, mapping objective values to their corresponding
+     *     positions
+     * @param candidatePosition the position vector associated with the candidate solution
+     * @param candidate the objective value of the candidate solution
+     * @return {@code true} if the candidate was added to the Pareto front; {@code false} otherwise
      */
-    public boolean updateParetoFront(Map<Double, List<Double>> paretoFront, List<Double> candidatePosition, double candidate) {
+    public boolean updateParetoFront(
+            Map<Double, List<Double>> paretoFront,
+            List<Double> candidatePosition,
+            double candidate) {
         double archive;
+        Double archiveKeyToRemove = null;
+        boolean doesDominante = false,
+                isStrictlySmaller = false;
+        if(paretoFront == null){
+            paretoFront = new TreeMap<>();
+            paretoFront.put(candidate, candidatePosition);
+            this.paretoFront = (TreeMap<Double, List<Double>>) paretoFront;
+            return true;
+        }
         for (Map.Entry<Double, List<Double>> entry : paretoFront.entrySet()) {
             archive = entry.getKey();
-            if (this.doesDominate(archive, candidate)) {
-                return false;
-            } else if (this.doesDominate(candidate, archive)) {
-                paretoFront.remove(archive);
+            if (candidate <= archive) {
+                doesDominante = true;
+            }
+            if (candidate < archive) {
+                isStrictlySmaller = true;
+            }
+            if (doesDominante && isStrictlySmaller) {
+                archiveKeyToRemove = archive;
             }
         }
-        paretoFront.put(candidate, candidatePosition);
-        return true;
+        if (doesDominante) {
+            if (archiveKeyToRemove != null) {
+                paretoFront.remove(archiveKeyToRemove);
+                paretoFront.put(candidate, candidatePosition);
+                this.paretoFront = (TreeMap<Double, List<Double>>) paretoFront;
+            } else {
+                paretoFront.put(candidate, candidatePosition);
+                this.paretoFront = (TreeMap<Double, List<Double>>) paretoFront;
+            }
+            return true;
+        }
+        return false;
     }
 
-    /**
-     * Evaluates whether a candidate dominates a solution in the archive.
-     *
-     * @param archive the archived solution (best found so far)
-     * @param candidate the new candidate solution
-     * @return true if the candidate dominates the archive solution
-     */
-    public boolean doesDominate(double archive, double candidate) {
-        boolean doesDominant = false;
-        boolean isStrictlySmaller = false;
-
-        if (candidate <= archive) {
-            doesDominant = true;
-        }
-        if (candidate < archive) {
-            isStrictlySmaller = true;
-        }
-        return doesDominant && isStrictlySmaller;
-    }
-
+    @SuppressWarnings("unchecked")
    public List<Double> getRandomOfBestTenSolution(Map<Double, List<Double>> paretoFront) {
        if (paretoFront.size() < SOLUTIONS_HEAD) {
-           return paretoFront.get(new Random().nextDouble(paretoFront.size()));
+           Object[] values = paretoFront.values().toArray();
+           return (List<Double>) values[new Random().nextInt(values.length)];
        }
-       return paretoFront.get(new Random().nextDouble(SOLUTIONS_HEAD));
+       Object[] values = paretoFront.values().toArray();
+       return (List<Double>) values[new Random().nextInt(SOLUTIONS_HEAD)];
     }
 
     /**

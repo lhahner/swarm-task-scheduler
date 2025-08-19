@@ -50,6 +50,7 @@ public class Swarm<T extends Agent> implements Iterable<T> {
 	public Swarm(List<Double> position, List<Double> velocity, int size, Class<T> type) {
 		this.type = type;
 		this.agents = new ArrayList<>();
+
 		IntStream.range(0, size)
 				.forEach(
 						i -> {
@@ -59,6 +60,7 @@ public class Swarm<T extends Agent> implements Iterable<T> {
 								log.warn("Failed to create agent {} causing {}", i, e);
 							}
 						});
+		this.setGlobalBests(position);
 	}
 
 	/** Returns the complete swarm and its values as a string. */

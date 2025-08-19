@@ -28,7 +28,7 @@ import java.util.*;
  * <ol>
  *   <li>Instantiate this strategy and set {@link #evaluation}, cloud resources, and (optionally)
  *       a {@link #visualizationStrategy}.</li>
- *   <li>Call {@link #optimize(Swarm, List, List, int)} to initialize and iterate the swarm.</li>
+ *   <li>Call {@link #optimize(List, List, int)} to initialize and iterate the swarm.</li>
  * </ol>
  *
  * <p><strong>Note:</strong> This class assumes that the provided {@link Evaluation} is deterministic for
@@ -60,7 +60,7 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
     /**
      * Objective function used to evaluate candidate solutions (e.g., makespan).
      */
-    protected Evaluation evaluation;
+    protected final Evaluation evaluation = new Evaluation();
 
     /**
      * Cloud tasks used by the {@link #evaluation} to score particle positions.
@@ -83,7 +83,7 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
      *
      * <p>Implementation detail: a {@link TreeMap} is used so densities are ordered.
      */
-    private Map<Double, MultiAdaptiveParticle> localDensities;
+    private TreeMap<Double, MultiAdaptiveParticle> localDensities;
 
     /**
      * Optimizes a given swarm starting from a specified position and velocity over a defined swarm size.
@@ -105,26 +105,25 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
      *   <li>{@code position} and {@code velocity} match the dimensionality expected by the evaluation.</li>
      * </ul>
      *
-     * @param swarm the swarm to be optimized; will be re-initialized inside this method.
      * @param position the initial position template used to construct the swarm.
      * @param velocity the initial velocity template used to construct the swarm.
      * @param swarmSize the number of particles to create; also determines the iteration pass here.
      */
-    public void optimize(
-            Swarm<MultiAdaptiveParticle> swarm, List<Double> position, List<Double> velocity, int swarmSize) {
-        swarm = new Swarm<>(position, velocity, swarmSize, MultiAdaptiveParticle.class);
+    public double optimize(
+            List<Double> position, List<Double> velocity, int swarmSize) {
+        Swarm<MultiAdaptiveParticle> swarm = new Swarm<MultiAdaptiveParticle>(position, velocity, swarmSize, MultiAdaptiveParticle.class);
         setCenterOfPopulations(swarm);
         joinCenterOfPopulations();
 
         for (Population<MultiAdaptiveParticle> population : populations) {
-            for (MultiAdaptiveParticle particle : population.getPopulation()) {
+            for (MultiAdaptiveParticle particle : population.getAgents()) {
                 if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
                         < evaluation.evaluateMakespan(particle.getParticlesBest(), cloudTasks, cloudVms)) {
                     List<Double> newParticlesBest = particle.getPosition();
                     particle.setParticlesBest(newParticlesBest);
                 }
                 if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
-                        < evaluation.evaluateMakespan(swarm.getGlobalBests(), cloudTasks, cloudVms)) {
+                        < evaluation.evaluateMakespan(population.getLocalBest(), cloudTasks, cloudVms)) {
                     population.setLocalBest(particle.getPosition());
                 }
                 particle.calculateVelocity(
@@ -143,6 +142,11 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
                 particle.calculateNewPosition(particle.getPosition(), particle.getVelocity());
             }
         }
+        List<Double> localBests = new ArrayList<>();
+        for(Population<MultiAdaptiveParticle> positionsBests : populations) {
+            localBests.add(evaluation.evaluateMakespan(positionsBests.getLocalBest(), cloudTasks, cloudVms));
+        }
+        return localBests.stream().mapToDouble(Double::doubleValue).min().getAsDouble();
     }
 
     /**
@@ -162,28 +166,45 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
     public void setCenterOfPopulations(Swarm<MultiAdaptiveParticle> swarm) {
         List<Population<MultiAdaptiveParticle>> populations = new ArrayList<>();
         localDensities = new TreeMap<>();
-        // Calculate densities.
-        for (MultiAdaptiveParticle multiAdaptiveParticle : swarm.getAgents()) {
-            multiAdaptiveParticle.setLocalDensity(swarm);
-            localDensities.put(multiAdaptiveParticle.getLocalDensity(), multiAdaptiveParticle);
+
+        // FIX: compute global cutoff distance once for the swarm (percentile = 1.0 as in your CUTOFF).
+        final double dc = MultiAdaptiveParticle.computeCutoffDistance(swarm, 1.0);
+
+        // Calculate densities (using shared d_c) and store in the map.
+        int index = 0;
+        for (MultiAdaptiveParticle p : swarm.getAgents()) {
+            p.setLocalDensity(index, swarm, dc); // FIX: new overload that accepts d_c
+            // FIX: avoid overwriting when densities are equal by nudging the key
+            double key = p.getLocalDensity();
+            while (localDensities.containsKey(key)) {
+                key = Math.nextUp(key);
+            }
+            localDensities.put(key, p);
+            index++;
         }
-        // Largest local density.
+
+        // Largest local density -> first center.
         double largestLocalDensity =
-                localDensities.keySet().stream().mapToDouble(Double::doubleValue).max().getAsDouble();
-        // Add largest as center of the first population.
-        populations.add(initalizePopulation(localDensities.get(largestLocalDensity)));
-        // Remove from the density list to avoid joining it later.
-        localDensities.remove(largestLocalDensity);
-        // Optionally create additional populations based on split threshold.
-        for (Map.Entry<Double, MultiAdaptiveParticle> entry : localDensities.entrySet()) {
-            double nextKey = localDensities.keySet().iterator().next();
-            if ((largestLocalDensity - nextKey) >= SPLIT_THRESHOLD) {
-                populations.add(initalizePopulation(localDensities.get(nextKey)));
-                localDensities.remove(nextKey);
+                localDensities.isEmpty()
+                        ? 0.0
+                        : localDensities.lastKey();
+
+        if (!localDensities.isEmpty()) {
+            populations.add(initalizePopulation(localDensities.get(largestLocalDensity)));
+            localDensities.remove(largestLocalDensity);
+        }
+
+        // FIX: iterate over a snapshot and use correct next keys (don’t call keySet().iterator().next() each time)
+        for (Double key : new ArrayList<>(localDensities.keySet())) {
+            if ((largestLocalDensity - key) >= SPLIT_THRESHOLD) {
+                populations.add(initalizePopulation(localDensities.get(key)));
+                localDensities.remove(key);
             }
         }
+
         this.populations = populations;
     }
+
 
     /**
      * Assigns remaining particles (those not selected as centers) to the nearest population
@@ -196,17 +217,32 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
      * {@link #localDensities} were prepared by {@link #setCenterOfPopulations(Swarm)}.
      */
     public void joinCenterOfPopulations() {
-        for (Map.Entry<Double, MultiAdaptiveParticle> entry : localDensities.entrySet()) {
+        // FIX: iterate on a snapshot to avoid ConcurrentModificationException
+        List<Map.Entry<Double, MultiAdaptiveParticle>> entries = new ArrayList<>(localDensities.entrySet());
+
+        for (Map.Entry<Double, MultiAdaptiveParticle> entry : entries) {
+            MultiAdaptiveParticle particle = entry.getValue();
             Population<MultiAdaptiveParticle> populationToJoin = null;
-            double differenceOfLocalDensity = populations.get(0).getCenter().getLocalDensity();
+
+            // FIX: use absolute difference and initialize to +infinity
+            double bestDelta = Double.POSITIVE_INFINITY;
+
             for (Population<MultiAdaptiveParticle> population : populations) {
-                if (population.getCenter().getLocalDensity() - entry.getKey() < differenceOfLocalDensity) {
-                    differenceOfLocalDensity = population.getCenter().getLocalDensity() - entry.getKey();
+                double delta = Math.abs(population.getCenter().getLocalDensity() - particle.getLocalDensity());
+                if (delta < bestDelta) {
+                    bestDelta = delta;
                     populationToJoin = population;
                 }
             }
-            assert populationToJoin != null;
-            populationToJoin.addAgent(entry.getValue());
+
+            if (populationToJoin == null) {
+                // Fallback: if no populations (shouldn’t happen), create one
+                populationToJoin = initalizePopulation(particle);
+                populations.add(populationToJoin);
+            }
+
+            populationToJoin.addAgent(particle);
+            // FIX: don’t remove while iterating original map; we’re iterating over a snapshot
             localDensities.remove(entry.getKey());
         }
     }
@@ -222,6 +258,7 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
         Population<MultiAdaptiveParticle> population = new Population<MultiAdaptiveParticle>();
         population.setCenter(center);
         population.addAgent(center);
+        population.setLocalBest(center.getPosition());
         return population;
     }
 }

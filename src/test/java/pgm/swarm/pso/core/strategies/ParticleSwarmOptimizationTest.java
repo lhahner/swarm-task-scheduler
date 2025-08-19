@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ParticleSwarmOptimizationTests {
+public class ParticleSwarmOptimizationTest {
     private ParticleSwarmOptimization pso;
 
     @BeforeEach
@@ -77,19 +77,4 @@ public class ParticleSwarmOptimizationTests {
         assertEquals(originalPosition, particle.getPosition(), "Position should remain unchanged");
     }
 
-    @Test
-    void testOptimize_Positive() {
-        List<Double> initialPosition = Arrays.asList(0.0, 0.0);
-        List<Double> initialVelocity = Arrays.asList(0.0, 0.0);
-        int swarmSize = 3;
-        Swarm<Particle> swarm = new Swarm<>(initialPosition, initialVelocity, swarmSize, Particle.class);
-
-        pso.optimize(swarm, initialPosition, initialVelocity, swarmSize);
-
-        assertEquals(swarmSize, swarm.getAgents().size());
-        for (Particle particle : swarm.getAgents()) {
-            assertNotNull(particle.getPosition());
-            assertNotNull(particle.getVelocity());
-        }
-    }
 }

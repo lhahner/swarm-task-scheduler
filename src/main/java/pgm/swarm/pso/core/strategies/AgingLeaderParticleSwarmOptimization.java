@@ -2,6 +2,7 @@ package pgm.swarm.pso.core.strategies;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.CloudletSimple;
@@ -35,6 +36,7 @@ import java.util.List;
 @Getter
 @Log4j2
 @AllArgsConstructor
+@NoArgsConstructor
 public class AgingLeaderParticleSwarmOptimization implements OptimizationStrategy<Particle> {
 
     /**
@@ -45,7 +47,7 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
     /**
      * Objective function used to evaluate particle positions (e.g., makespan).
      */
-    protected Evaluation evaluation;
+    protected final Evaluation evaluation = new Evaluation();
 
     /**
      * Cloud tasks used by {@link #evaluation} to score candidate solutions.
@@ -85,16 +87,15 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
      * {@link #cloudVms} must be non-null and consistent with the dimensionality of
      * {@code position} and {@code velocity}.</p>
      *
-     * @param swarm the swarm instance to optimize; will be re-initialized inside this method
      * @param position template of the initial position for each particle
      * @param velocity template of the initial velocity for each particle
      * @param swarmSize number of particles to create and the number of iterations to run
      */
     @Override
-    public void optimize(
-            Swarm<Particle> swarm, List<Double> position, List<Double> velocity, int swarmSize) {
-        swarm = new Swarm<>(position, velocity, swarmSize, Particle.class);
-        setAgingLeaderParticle((AgingLeaderParticle) swarm.getAgents().getFirst());
+    public double optimize(
+            List<Double> position, List<Double> velocity, int swarmSize) {
+        Swarm<AgingLeaderParticle> swarm = new Swarm<AgingLeaderParticle>(position, velocity, swarmSize, AgingLeaderParticle.class);
+        setAgingLeaderParticle((AgingLeaderParticle) swarm.getAgents().get(0));
 
         for (int i = 0; i < swarmSize; i++) {
             for (Particle particle : swarm.getAgents()) {
@@ -131,6 +132,7 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
             // Note: Ensure agingLeaderParticle is non-null before calling this in production code.
             this.agingLeaderParticle.incrementLeaderAge();
         }
+        return 0.0;
     }
 
     /**
@@ -139,9 +141,9 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
      *
      * @param swarm the swarm that will receive the new challenger agent
      */
-    public void spawnAndSetChallengerInSwarm(Swarm<Particle> swarm) {
+    public void spawnAndSetChallengerInSwarm(Swarm<AgingLeaderParticle> swarm) {
         this.challengerParticle = new ChallengerParticle();
-        swarm.getAgents().add(new ChallengerParticle(swarm.getAgents().getFirst()));
+        swarm.getAgents().add(new ChallengerParticle(swarm.getAgents().get(0)));
     }
 
     /**

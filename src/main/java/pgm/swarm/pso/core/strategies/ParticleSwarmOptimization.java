@@ -37,15 +37,14 @@ public class ParticleSwarmOptimization implements OptimizationStrategy<Particle>
      * Optimizes a given swarm starting from a specified position over a defined number of iterations.
      * This is domain independent.
      *
-     * @param swarm the swarm to be optimized
      * @param position the starting position for the particles
      * @param velocity the starting velocity for the particles
      * @param swarmSize the number of particles in the swarm, which also determines the number of
      *     iterations
      */
-    public void optimize(
-            Swarm<Particle> swarm, List<Double> position, List<Double> velocity, int swarmSize) {
-        swarm = new Swarm<>(position, velocity, swarmSize, Particle.class);
+    public double optimize(
+            List<Double> position, List<Double> velocity, int swarmSize) {
+        Swarm<Particle> swarm = new Swarm<>(position, velocity, swarmSize, Particle.class);
         for (int i = 0; i < swarmSize; i++) {
             for (Particle particle : swarm.getAgents()) {
                 if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
@@ -65,6 +64,7 @@ public class ParticleSwarmOptimization implements OptimizationStrategy<Particle>
                 particle.calculateNewPosition(particle.getPosition(), particle.getVelocity());
             }
         }
+        return 0.0;
     }
 
     /**
