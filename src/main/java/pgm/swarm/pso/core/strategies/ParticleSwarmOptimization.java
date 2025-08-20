@@ -47,6 +47,7 @@ public class ParticleSwarmOptimization implements OptimizationStrategy<Particle>
         Swarm<Particle> swarm = new Swarm<>(position, velocity, swarmSize, Particle.class);
         for (int i = 0; i < swarmSize; i++) {
             for (Particle particle : swarm.getAgents()) {
+                resetParticlesOutOfRange(particle, cloudVms, cloudTasks);
                 if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
                         < evaluation.evaluateMakespan(particle.getParticlesBest(), cloudTasks, cloudVms)) {
                     List<Double> newParticlesBest = particle.getPosition();

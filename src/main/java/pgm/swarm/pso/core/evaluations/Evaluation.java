@@ -1,5 +1,7 @@
 package pgm.swarm.pso.core.evaluations;
 
+import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.Cloudlet;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
@@ -12,6 +14,7 @@ import java.util.stream.DoubleStream;
 /**
  * Implements diverse types of evaluations functions to use.
  */
+@Log4j2
 public class Evaluation {
     /* Will provide the end result of the evaluation */
     private double objective;
@@ -62,14 +65,10 @@ public class Evaluation {
         Cloudlet task;
         double makespan = 0;
         for(int i = 0; i < cloudTasks.size(); i++) {
-            vm = cloudVms.get((Math.abs((int)(Math.round(currentPosition.get(i))))));
-            task = cloudTasks.get(Math.abs((int) Math.round(currentPosition.get(i))));
-            if (vm.isSuitableForCloudlet(task)) {
-                makespan = makespan + (task.getLength() / (vm.getMips() * vm.getFreePesNumber()));
-            } else {
-                return 10.0;
+            vm = cloudVms.get((Math.abs((int)(Math.round(currentPosition.get(i))))) >= cloudVms.size() ? cloudVms.size()-1 : (Math.abs((int)(Math.round(currentPosition.get(i))))));
+            task = cloudTasks.get(i);
+            makespan = makespan + (task.getLength() / (vm.getMips() * vm.getFreePesNumber()));
             }
-        }
         return makespan;
     }
 
@@ -99,15 +98,12 @@ public class Evaluation {
                 || Math.abs((int) Math.round(currentPosition.stream().mapToDouble(Double::doubleValue).sum())) >= cloudTasks.size()) {
             return 10.0;
         }
+        Vm vm;
+        Cloudlet task;
         double executionTime=0;
         for(int i = 0; i < cloudTasks.size(); i++) {
-            Vm vm = cloudVms.get((Math.abs((int)(Math.round(currentPosition.get(i))))));
-            Cloudlet task = cloudTasks.get(Math.abs((int) Math.round(currentPosition.get(i))));
-            if (vm.isSuitableForCloudlet(task)) {
-                executionTime = executionTime + (double) task.getLength() /(vm.getRam().getAllocatedResource()*vm.getRam().getCapacity());
-            } else {
-                return 10.0;
-            }
+            vm = cloudVms.get((Math.abs((int)(Math.round(currentPosition.get(i))))) >= cloudVms.size() ? cloudVms.size()-1 : (Math.abs((int)(Math.round(currentPosition.get(i))))));
+            task = cloudTasks.get(i);
         }
         return executionTime;
     }

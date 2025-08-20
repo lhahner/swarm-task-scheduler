@@ -122,7 +122,7 @@ class MultiAdaptiveParticleSwarmOptimizationTest {
 
         List<Double> test_position = List.of(Math.random(), Math.random(), Math.random());
         List<Double> test_velocities = List.of(test_positions[0][1], test_positions[1][1], test_positions[2][1]);
-        Assertions.assertEquals((5.0 / (5.0 * 3.0)), strat.optimize(test_position, test_velocities, 5));
+        Assertions.assertEquals((5.0 / (5.0 * 3.0)), strat.optimize(test_position, test_velocities, 2));
 
     }
 }

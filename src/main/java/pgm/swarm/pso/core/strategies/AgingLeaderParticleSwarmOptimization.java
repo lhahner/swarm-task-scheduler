@@ -7,15 +7,18 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
+import pgm.swarm.Population;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
 import pgm.swarm.pso.core.decorators.AgingLeaderParticle;
 import pgm.swarm.pso.core.decorators.ChallengerParticle;
+import pgm.swarm.pso.core.decorators.MultiAdaptiveParticle;
 import pgm.swarm.pso.core.evaluations.Evaluation;
 import pgm.visualization.VisualizationStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Particle Swarm Optimization (PSO) strategy with an "aging leader" mechanism.
@@ -99,12 +102,18 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
 
         for (int i = 0; i < swarmSize; i++) {
             for (Particle particle : swarm.getAgents()) {
+                resetParticlesOutOfRange(particle, cloudVms, cloudTasks);
+                resetParticlesOutOfRange(agingLeaderParticle, cloudVms, cloudTasks);
                 if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
                         < evaluation.evaluateMakespan(particle.getParticlesBest(), cloudTasks, cloudVms)) {
                     List<Double> newParticlesBest = particle.getPosition();
                     particle.setParticlesBest(newParticlesBest);
                 }
-
+                if (evaluation.evaluateMakespan(agingLeaderParticle.getPosition(), cloudTasks, cloudVms)
+                        < evaluation.evaluateMakespan(agingLeaderParticle.getParticlesBest(), cloudTasks, cloudVms)) {
+                    List<Double> newParticlesBest = agingLeaderParticle.getPosition();
+                    agingLeaderParticle.setParticlesBest(newParticlesBest);
+                }
                 if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
                         < evaluation.evaluateMakespan(agingLeaderParticle.getPosition(), cloudTasks, cloudVms)) {
                     setAgingLeaderParticle((AgingLeaderParticle) particle);
@@ -128,11 +137,29 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
                 }
                 particle.calculateNewPosition(particle.getPosition(), particle.getVelocity());
             }
-
-            // Note: Ensure agingLeaderParticle is non-null before calling this in production code.
             this.agingLeaderParticle.incrementLeaderAge();
         }
-        return 0.0;
+        return evaluation.evaluateMakespan(agingLeaderParticle.getParticlesBest(), cloudTasks, cloudVms);
+    }
+
+    /**
+     * Checks if the position of the particle is too large to be in the scope of the provided VMs and
+     * tasks. If so, reset the particle’s position randomly within the valid range.
+     *
+     * @param particle the particle to be checked and potentially reset
+     * @param vmList the list of VMs used
+     * @param taskList the list of tasks used
+     */
+    protected void resetParticlesOutOfRange(
+            Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
+        int scalingFactor = Math.max(taskList.size(), vmList.size());
+
+        IntStream.range(0, particle.getPosition().size()).forEach(i -> {
+            if (particle.getPosition().get(i) >= vmList.size()
+                    || particle.getPosition().get(i) >= taskList.size()){
+                particle.getPosition().set(i, Math.random() * scalingFactor);
+            }
+        });
     }
 
     /**

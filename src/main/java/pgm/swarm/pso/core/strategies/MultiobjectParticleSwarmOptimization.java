@@ -1,6 +1,7 @@
 package pgm.swarm.pso.core.strategies;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -56,6 +57,7 @@ public class MultiobjectParticleSwarmOptimization
                         position, velocity, swarmSize, MultiobjectParticle.class);
         for (int i = 0; i < swarmSize; i++) {
             for (MultiobjectParticle particle : swarm.getAgents()) {
+                resetParticlesOutOfRange(particle, cloudVms, cloudTasks);
                 if (updateParetoFront(
                         paretoFront,
                         particle.getPosition(),
@@ -82,7 +84,27 @@ public class MultiobjectParticleSwarmOptimization
                         particle.getPosition(), particle.getVelocity());
             }
         }
-        return swarm.getGlobalBest();
+        return evaluation.evaluateMakespan(swarm.getGlobalBests(), cloudTasks, cloudVms);
+    }
+
+    /**
+     * Checks if the position of the particle is too large to be in the scope of the provided VMs and
+     * tasks. If so, reset the particle’s position randomly within the valid range.
+     *
+     * @param particle the particle to be checked and potentially reset
+     * @param vmList the list of VMs used
+     * @param taskList the list of tasks used
+     */
+    protected void resetParticlesOutOfRange(
+            Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
+        int scalingFactor = Math.max(taskList.size(), vmList.size());
+
+        IntStream.range(0, particle.getPosition().size()).forEach(i -> {
+            if (particle.getPosition().get(i) >= vmList.size()
+                    || particle.getPosition().get(i) >= taskList.size()){
+                particle.getPosition().set(i, Math.random() * scalingFactor);
+            }
+        });
     }
 
     /**

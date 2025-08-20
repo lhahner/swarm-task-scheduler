@@ -9,11 +9,13 @@ import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.vms.Vm;
 import pgm.swarm.Population;
 import pgm.swarm.Swarm;
+import pgm.swarm.pso.core.Particle;
 import pgm.swarm.pso.core.decorators.MultiAdaptiveParticle;
 import pgm.swarm.pso.core.evaluations.Evaluation;
 import pgm.visualization.VisualizationStrategy;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * Multi-population Particle Swarm Optimization (PSO) strategy that operates on
@@ -114,32 +116,34 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
         Swarm<MultiAdaptiveParticle> swarm = new Swarm<MultiAdaptiveParticle>(position, velocity, swarmSize, MultiAdaptiveParticle.class);
         setCenterOfPopulations(swarm);
         joinCenterOfPopulations();
-
-        for (Population<MultiAdaptiveParticle> population : populations) {
-            for (MultiAdaptiveParticle particle : population.getAgents()) {
-                if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
-                        < evaluation.evaluateMakespan(particle.getParticlesBest(), cloudTasks, cloudVms)) {
-                    List<Double> newParticlesBest = particle.getPosition();
-                    particle.setParticlesBest(newParticlesBest);
+        for(int i = 0; i < swarmSize; i++) {
+            for (Population<MultiAdaptiveParticle> population : populations) {
+                for (MultiAdaptiveParticle particle : population.getAgents()) {
+                    resetParticlesOutOfRange(particle, cloudVms, cloudTasks);
+                    if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
+                            < evaluation.evaluateMakespan(particle.getParticlesBest(), cloudTasks, cloudVms)) {
+                        List<Double> newParticlesBest = particle.getPosition();
+                        particle.setParticlesBest(newParticlesBest);
+                    }
+                    if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
+                            < evaluation.evaluateMakespan(population.getLocalBest(), cloudTasks, cloudVms)) {
+                        population.setLocalBest(particle.getPosition());
+                    }
+                    particle.calculateVelocity(
+                            particle.getVelocity(),
+                            particle.getParticlesBest(),
+                            particle.getPosition(),
+                            population.getLocalBest());
+                    particle.updateVelocityLocalBest(
+                            particle.getVelocity(),
+                            particle.getParticlesBest(),
+                            particle.getPosition(),
+                            population.getLocalBest(),
+                            populations.size(),
+                            populations
+                    );
+                    particle.calculateNewPosition(particle.getPosition(), particle.getVelocity());
                 }
-                if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
-                        < evaluation.evaluateMakespan(population.getLocalBest(), cloudTasks, cloudVms)) {
-                    population.setLocalBest(particle.getPosition());
-                }
-                particle.calculateVelocity(
-                        particle.getVelocity(),
-                        particle.getParticlesBest(),
-                        particle.getPosition(),
-                        population.getLocalBest());
-                particle.updateVelocityLocalBest(
-                        particle.getVelocity(),
-                        particle.getParticlesBest(),
-                        particle.getPosition(),
-                        population.getLocalBest(),
-                        populations.size(),
-                        populations
-                );
-                particle.calculateNewPosition(particle.getPosition(), particle.getVelocity());
             }
         }
         List<Double> localBests = new ArrayList<>();
@@ -147,6 +151,26 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
             localBests.add(evaluation.evaluateMakespan(positionsBests.getLocalBest(), cloudTasks, cloudVms));
         }
         return localBests.stream().mapToDouble(Double::doubleValue).min().getAsDouble();
+    }
+
+    /**
+     * Checks if the position of the particle is too large to be in the scope of the provided VMs and
+     * tasks. If so, reset the particle’s position randomly within the valid range.
+     *
+     * @param particle the particle to be checked and potentially reset
+     * @param vmList the list of VMs used
+     * @param taskList the list of tasks used
+     */
+    protected void resetParticlesOutOfRange(
+            Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
+        int scalingFactor = Math.max(taskList.size(), vmList.size());
+
+        IntStream.range(0, particle.getPosition().size()).forEach(i -> {
+            if (particle.getPosition().get(i) >= vmList.size()
+                    || particle.getPosition().get(i) >= taskList.size()){
+                particle.getPosition().set(i, Math.random() * scalingFactor);
+            }
+        });
     }
 
     /**
@@ -242,7 +266,7 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
             }
 
             populationToJoin.addAgent(particle);
-            // FIX: don’t remove while iterating original map; we’re iterating over a snapshot
+            // FIX: don’t remove while iterating an original map; we’re iterating over a snapshot
             localDensities.remove(entry.getKey());
         }
     }
