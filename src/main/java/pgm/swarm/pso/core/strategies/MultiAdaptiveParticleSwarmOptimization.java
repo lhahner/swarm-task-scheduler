@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.CloudletSimple;
-import org.cloudsimplus.vms.Vm;
+import org.cloudsimplus.vms.VmSimple;
 import pgm.swarm.Population;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
@@ -67,12 +67,12 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
     /**
      * Cloud tasks used by the {@link #evaluation} to score particle positions.
      */
-    private ArrayList<CloudletSimple> cloudTasks;
+    private List<CloudletSimple> cloudTasks;
 
     /**
      * Cloud VMs used by the {@link #evaluation} to score particle positions.
      */
-    private ArrayList<Vm> cloudVms;
+    private List<VmSimple> cloudVms;
 
     /**
      * Discovered populations derived from the swarm via local density analysis.
@@ -91,7 +91,7 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
      * Optimizes a given swarm starting from a specified position and velocity over a defined swarm size.
      *
      * <p>This method re-initializes the provided {@code swarm} instance using the given
-     * {@code position}, {@code velocity}, and {@code swarmSize}, partitions it into populations,
+     * {@code position}, {@code velocity}, and {@code epochs}, partitions it into populations,
      * and then performs a single pass over each {@link Population} to update each particle:
      * <ul>
      *   <li>Update personal best if current position is better.</li>
@@ -109,14 +109,14 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
      *
      * @param position the initial position template used to construct the swarm.
      * @param velocity the initial velocity template used to construct the swarm.
-     * @param swarmSize the number of particles to create; also determines the iteration pass here.
+     * @param epochs the number of particles to create; also determines the iteration pass here.
      */
     public double optimize(
-            List<Double> position, List<Double> velocity, int swarmSize) {
-        Swarm<MultiAdaptiveParticle> swarm = new Swarm<MultiAdaptiveParticle>(position, velocity, swarmSize, MultiAdaptiveParticle.class);
+            List<Double> position, List<Double> velocity, int epochs) {
+        Swarm<MultiAdaptiveParticle> swarm = new Swarm<MultiAdaptiveParticle>(position, velocity, cloudTasks.size(), MultiAdaptiveParticle.class);
         setCenterOfPopulations(swarm);
         joinCenterOfPopulations();
-        for(int i = 0; i < swarmSize; i++) {
+        for(int i = 0; i < epochs; i++) {
             for (Population<MultiAdaptiveParticle> population : populations) {
                 for (MultiAdaptiveParticle particle : population.getAgents()) {
                     resetParticlesOutOfRange(particle, cloudVms, cloudTasks);
@@ -144,7 +144,9 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
                     );
                     particle.calculateNewPosition(particle.getPosition(), particle.getVelocity());
                 }
+                log.info("iteration number {} and local best position vector {} with optimal makespan {}", i, population.getLocalBest(), evaluation.evaluateMakespan(population.getLocalBest(), cloudTasks, cloudVms));
             }
+
         }
         List<Double> localBests = new ArrayList<>();
         for(Population<MultiAdaptiveParticle> positionsBests : populations) {
@@ -162,7 +164,7 @@ public class MultiAdaptiveParticleSwarmOptimization implements OptimizationStrat
      * @param taskList the list of tasks used
      */
     protected void resetParticlesOutOfRange(
-            Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
+            Particle particle, List<VmSimple> vmList, List<CloudletSimple> taskList) {
         int scalingFactor = Math.max(taskList.size(), vmList.size());
 
         IntStream.range(0, particle.getPosition().size()).forEach(i -> {

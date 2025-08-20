@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.CloudletSimple;
-import org.cloudsimplus.vms.Vm;
-import pgm.swarm.Agent;
+import org.cloudsimplus.vms.VmSimple;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
 import pgm.swarm.pso.core.decorators.MultiobjectParticle;
@@ -35,7 +34,7 @@ public class MultiobjectParticleSwarmOptimization
     private TreeMap<Double, List<Double>> paretoFront; // 1 Solution 2 Position
     private List<Double> objectives;
     private ArrayList<CloudletSimple> cloudTasks;
-    private ArrayList<Vm> cloudVms;
+    private ArrayList<VmSimple> cloudVms;
     private double makespan, costs;
     protected VisualizationStrategy visualizationStrategy;
     protected final Evaluation evaluation = new Evaluation();
@@ -55,7 +54,8 @@ public class MultiobjectParticleSwarmOptimization
             int swarmSize) {
         Swarm<MultiobjectParticle> swarm = new Swarm<MultiobjectParticle>(
                         position, velocity, swarmSize, MultiobjectParticle.class);
-        for (int i = 0; i < swarmSize; i++) {
+        int i = 0;
+        for (; i < swarmSize; i++) {
             for (MultiobjectParticle particle : swarm.getAgents()) {
                 resetParticlesOutOfRange(particle, cloudVms, cloudTasks);
                 if (updateParetoFront(
@@ -84,6 +84,7 @@ public class MultiobjectParticleSwarmOptimization
                         particle.getPosition(), particle.getVelocity());
             }
         }
+        log.info("iteration number {} and local best position vector {} with optimal makespan {}", i, swarm.getGlobalBests(), evaluation.evaluateMakespan(swarm.getGlobalBests(), cloudTasks, cloudVms));
         return evaluation.evaluateMakespan(swarm.getGlobalBests(), cloudTasks, cloudVms);
     }
 
@@ -96,7 +97,7 @@ public class MultiobjectParticleSwarmOptimization
      * @param taskList the list of tasks used
      */
     protected void resetParticlesOutOfRange(
-            Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
+            Particle particle, ArrayList<VmSimple> vmList, ArrayList<CloudletSimple> taskList) {
         int scalingFactor = Math.max(taskList.size(), vmList.size());
 
         IntStream.range(0, particle.getPosition().size()).forEach(i -> {

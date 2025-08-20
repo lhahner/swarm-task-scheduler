@@ -6,11 +6,10 @@ import java.util.stream.IntStream;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.CloudletSimple;
-import org.cloudsimplus.vms.Vm;
+import org.cloudsimplus.vms.VmSimple;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
 import pgm.swarm.pso.core.evaluations.Evaluation;
@@ -31,7 +30,7 @@ public class ParticleSwarmOptimization implements OptimizationStrategy<Particle>
     protected VisualizationStrategy visualizationStrategy;
     protected Evaluation evaluation;
     private ArrayList<CloudletSimple> cloudTasks;
-    private ArrayList<Vm> cloudVms;
+    private ArrayList<VmSimple> cloudVms;
 
     /**
      * Optimizes a given swarm starting from a specified position over a defined number of iterations.
@@ -77,7 +76,7 @@ public class ParticleSwarmOptimization implements OptimizationStrategy<Particle>
      * @param taskList the list of tasks used
      */
     protected void resetParticlesOutOfRange(
-            Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
+            Particle particle, ArrayList<VmSimple> vmList, ArrayList<CloudletSimple> taskList) {
         int scalingFactor = Math.max(taskList.size(), vmList.size());
 
         IntStream.range(0, particle.getPosition().size()).forEach(i -> {

@@ -113,7 +113,11 @@ public class Particle implements Agent {
             List<Double> particlesBest,
             List<Double> position,
             List<Double> globalBest) {
-        List<Double> newVelocity = new ArrayList<>(velocity);
+        if(velocity == null){
+           velocity = new ArrayList<>();
+           velocity = position;
+        }
+        List<Double> newVelocity = new ArrayList<Double>(velocity);
         if (velocity.size() != position.size()
                 || position.size() != particlesBest.size()
                 || position.size() != globalBest.size()) {

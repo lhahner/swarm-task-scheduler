@@ -1,6 +1,7 @@
 package pgm.swarm.pso.core.strategies;
 
 import org.cloudsimplus.brokers.DatacenterBrokerSimple;
+import org.cloudsimplus.cloudlets.Cloudlet;
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.core.CloudSimPlus;
 import org.cloudsimplus.core.Simulation;
@@ -14,9 +15,11 @@ import pgm.simulation.VirtualMachineUtility;
 import pgm.swarm.Population;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.decorators.MultiAdaptiveParticle;
+import pgm.swarm.pso.core.evaluations.Evaluation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -73,12 +76,12 @@ class MultiAdaptiveParticleSwarmOptimizationTest {
     @Test
     void optimize_smallDataCenter(){
         MultiAdaptiveParticleSwarmOptimization strat = new MultiAdaptiveParticleSwarmOptimization();
-        Simulation simulation = new CloudSimPlus();
+        CloudSimPlus simulation = new CloudSimPlus();
         DataCenterUtility dataCenterUtility = new DataCenterUtility();
         CloudLetUtility cloudLetUtility = new CloudLetUtility();
         VirtualMachineUtility virtualMachineUtility = new VirtualMachineUtility();
         dataCenterUtility.createDatacenter(simulation, 20, 10);
-        DatacenterBrokerSimple datacenterBrokerSimple = new DatacenterBrokerSimple((CloudSimPlus) simulation);
+        DatacenterBrokerSimple datacenterBrokerSimple = new DatacenterBrokerSimple(simulation);
         cloudLetUtility.generateCloudlets(2,2,20);
 
         // Adds VMs to VMList
@@ -86,43 +89,38 @@ class MultiAdaptiveParticleSwarmOptimizationTest {
             virtualMachineUtility.addVm(i, 30, 5);
         }
         cloudLetUtility.generateCloudlets(2, 2, 20);
-        double[][] test_positions = new double[3][2];
 
-        test_positions[0][0] = 0.231;
-        test_positions[0][1] = 1.212;
+        CloudletSimple bestCloudlet = new CloudletSimple(1, 1, 2);
+        List<CloudletSimple> cloudlets = List.of(
+                 new CloudletSimple(0, 3, 2), bestCloudlet
+                ,new CloudletSimple(2, 3, 7), new CloudletSimple(3, 2, 3)
+                ,new CloudletSimple(4, 7, 8), new CloudletSimple(5, 4, 5)
+                ,new CloudletSimple(6, 5, 3), new CloudletSimple(7, 2, 3)
+                ,new CloudletSimple(8, 8, 9)
+        );
 
-        test_positions[1][0] = 0.711;
-        test_positions[1][1] = 0.112;
+        VmSimple bestVm = new VmSimple(0, 5, 6);
+        List<VmSimple> vms = List.of(
+                 bestVm, new VmSimple(1, 5, 3)
+                ,new VmSimple(2, 1, 2), new VmSimple(3, 5, 3)
+                ,new VmSimple(4, 5, 3), new VmSimple(5, 5, 3)
+        );
 
-        test_positions[2][0] = 0.671;
-        test_positions[2][1] = 0.712;
+        strat.setCloudTasks(cloudlets);
+        strat.setCloudVms(vms);
 
-        CloudletSimple test_cls_1 = new CloudletSimple(0, 3, 2);
-        CloudletSimple test_cls_2 = new CloudletSimple(1, 5, 3);
-        CloudletSimple test_cls_3 = new CloudletSimple(2, 6, 7);
+        List<Double> positions  = new ArrayList<>();
+        IntStream.range(0, cloudlets.size()).forEach(i -> {
+            positions. add(Math.random());
+        });
 
-        ArrayList<CloudletSimple> test_cloudlets = new ArrayList<CloudletSimple>();
+        List<Double> velocities = new ArrayList<>();
+        IntStream.range(0, cloudlets.size()).forEach(i -> {
+            velocities. add(Math.random());
+        });
 
-        test_cloudlets.add(test_cls_1);
-        test_cloudlets.add(test_cls_2);
-        test_cloudlets.add(test_cls_3);
+       double minimalMakespan = (bestCloudlet.getLength() / (bestVm.getMips() * bestVm.getFreePesNumber()));
 
-        Vm test_vm_1 = new VmSimple(5, 3);
-        Vm test_vm_2 = new VmSimple(1, 2);
-        Vm test_vm_3 = new VmSimple(7, 6);
-
-        ArrayList<Vm> test_vms = new ArrayList<Vm>();
-
-        test_vms.add(test_vm_1);
-        test_vms.add(test_vm_2);
-        test_vms.add(test_vm_3);
-
-        strat.setCloudTasks(test_cloudlets);
-        strat.setCloudVms(test_vms);
-
-        List<Double> test_position = List.of(Math.random(), Math.random(), Math.random());
-        List<Double> test_velocities = List.of(test_positions[0][1], test_positions[1][1], test_positions[2][1]);
-        Assertions.assertEquals((5.0 / (5.0 * 3.0)), strat.optimize(test_position, test_velocities, 2));
-
+        Assertions.assertEquals(minimalMakespan, strat.optimize(positions, velocities, 500));
     }
 }

@@ -6,13 +6,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.CloudletSimple;
-import org.cloudsimplus.vms.Vm;
-import pgm.swarm.Population;
+import org.cloudsimplus.vms.VmSimple;
 import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
 import pgm.swarm.pso.core.decorators.AgingLeaderParticle;
 import pgm.swarm.pso.core.decorators.ChallengerParticle;
-import pgm.swarm.pso.core.decorators.MultiAdaptiveParticle;
 import pgm.swarm.pso.core.evaluations.Evaluation;
 import pgm.visualization.VisualizationStrategy;
 
@@ -55,12 +53,12 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
     /**
      * Cloud tasks used by {@link #evaluation} to score candidate solutions.
      */
-    private ArrayList<CloudletSimple> cloudTasks;
+    private List<CloudletSimple> cloudTasks;
 
     /**
      * Cloud virtual machines used by {@link #evaluation} to score candidate solutions.
      */
-    private ArrayList<Vm> cloudVms;
+    private List<VmSimple> cloudVms;
 
     /**
      * The current "aging" leader guiding the swarm; may be replaced if it becomes too old.
@@ -95,34 +93,50 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
      * @param swarmSize number of particles to create and the number of iterations to run
      */
     @Override
-    public double optimize(
-            List<Double> position, List<Double> velocity, int swarmSize) {
-        Swarm<AgingLeaderParticle> swarm = new Swarm<AgingLeaderParticle>(position, velocity, swarmSize, AgingLeaderParticle.class);
-        setAgingLeaderParticle((AgingLeaderParticle) swarm.getAgents().get(0));
-
-        for (int i = 0; i < swarmSize; i++) {
-            for (Particle particle : swarm.getAgents()) {
+    public double optimize(List<Double> position, List<Double> velocity, int swarmSize) {
+        Swarm<AgingLeaderParticle> swarm =
+                new Swarm<>(position, velocity, swarmSize, AgingLeaderParticle.class);
+        setAgingLeaderParticle(swarm.getAgents().get(0));
+        int i = 0;
+        for (; i < swarmSize; i++) {
+            List<ChallengerParticle> toAdd = new ArrayList<>();
+            for (AgingLeaderParticle particle : new ArrayList<>(swarm.getAgents())) {
+                if(particle.getParticlesBest() == null){
+                    particle.setParticlesBest(particle.getPosition());
+                }
                 resetParticlesOutOfRange(particle, cloudVms, cloudTasks);
-                resetParticlesOutOfRange(agingLeaderParticle, cloudVms, cloudTasks);
+                if (agingLeaderParticle != null) {
+                    resetParticlesOutOfRange(agingLeaderParticle, cloudVms, cloudTasks);
+                }
+
+                // update personal bests
                 if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
                         < evaluation.evaluateMakespan(particle.getParticlesBest(), cloudTasks, cloudVms)) {
                     List<Double> newParticlesBest = particle.getPosition();
                     particle.setParticlesBest(newParticlesBest);
                 }
-                if (evaluation.evaluateMakespan(agingLeaderParticle.getPosition(), cloudTasks, cloudVms)
-                        < evaluation.evaluateMakespan(agingLeaderParticle.getParticlesBest(), cloudTasks, cloudVms)) {
-                    List<Double> newParticlesBest = agingLeaderParticle.getPosition();
-                    agingLeaderParticle.setParticlesBest(newParticlesBest);
-                }
-                if (evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
-                        < evaluation.evaluateMakespan(agingLeaderParticle.getPosition(), cloudTasks, cloudVms)) {
-                    setAgingLeaderParticle((AgingLeaderParticle) particle);
-                } else if (agingLeaderParticle.isTooOld()) {
-                    this.setAgingLeaderParticle(null);
-                    spawnAndSetChallengerInSwarm(swarm);
+                if (agingLeaderParticle != null &&
+                        evaluation.evaluateMakespan(agingLeaderParticle.getPosition(), cloudTasks, cloudVms)
+                                < evaluation.evaluateMakespan(agingLeaderParticle.getParticlesBest(), cloudTasks, cloudVms)) {
+                    agingLeaderParticle.setParticlesBest(agingLeaderParticle.getPosition());
                 }
 
+                // leader update / aging
+                if (agingLeaderParticle == null ||
+                        evaluation.evaluateMakespan(particle.getPosition(), cloudTasks, cloudVms)
+                                < evaluation.evaluateMakespan(agingLeaderParticle.getPosition(), cloudTasks, cloudVms)) {
+                    setAgingLeaderParticle(particle);
+                } else if (agingLeaderParticle.isTooOld()) {
+                    setAgingLeaderParticle(null);
+                    challengerParticle = spawnAndSetChallengerInSwarm(swarm); // no mutation
+                    toAdd.add(new ChallengerParticle(swarm.getAgents().get(0))); // queue addition
+                }
+
+                // velocity & position
                 if (agingLeaderParticle == null) {
+                    if (challengerParticle == null) {
+                        challengerParticle = spawnAndSetChallengerInSwarm(swarm);
+                    }
                     particle.calculateVelocity(
                             particle.getVelocity(),
                             particle.getParticlesBest(),
@@ -137,9 +151,25 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
                 }
                 particle.calculateNewPosition(particle.getPosition(), particle.getVelocity());
             }
-            this.agingLeaderParticle.incrementLeaderAge();
+
+            // apply queued additions AFTER the iteration
+            if (!toAdd.isEmpty()) {
+                swarm.getAgents().addAll(toAdd);
+            }
+
+            if (agingLeaderParticle != null) {
+                agingLeaderParticle.incrementLeaderAge();
+            }
         }
-        return evaluation.evaluateMakespan(agingLeaderParticle.getParticlesBest(), cloudTasks, cloudVms);
+        log.info("iteration number {} and local best position vector {} with optimal makespan {}", i, agingLeaderParticle != null ? agingLeaderParticle.getParticlesBest()
+                : challengerParticle.getPosition(), evaluation.evaluateMakespan(
+                (agingLeaderParticle != null ? agingLeaderParticle.getParticlesBest()
+                        : challengerParticle.getPosition()),
+                cloudTasks, cloudVms));
+        return evaluation.evaluateMakespan(
+                (agingLeaderParticle != null ? agingLeaderParticle.getParticlesBest()
+                        : challengerParticle.getPosition()),
+                cloudTasks, cloudVms);
     }
 
     /**
@@ -151,7 +181,7 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
      * @param taskList the list of tasks used
      */
     protected void resetParticlesOutOfRange(
-            Particle particle, ArrayList<Vm> vmList, ArrayList<CloudletSimple> taskList) {
+            Particle particle, List<VmSimple> vmList, List<CloudletSimple> taskList) {
         int scalingFactor = Math.max(taskList.size(), vmList.size());
 
         IntStream.range(0, particle.getPosition().size()).forEach(i -> {
@@ -168,9 +198,10 @@ public class AgingLeaderParticleSwarmOptimization implements OptimizationStrateg
      *
      * @param swarm the swarm that will receive the new challenger agent
      */
-    public void spawnAndSetChallengerInSwarm(Swarm<AgingLeaderParticle> swarm) {
-        this.challengerParticle = new ChallengerParticle();
-        swarm.getAgents().add(new ChallengerParticle(swarm.getAgents().get(0)));
+    public ChallengerParticle spawnAndSetChallengerInSwarm(Swarm<AgingLeaderParticle> swarm) {
+        ChallengerParticle challengerParticle = new ChallengerParticle();
+        challengerParticle.setPosition((swarm.getGlobalBests() != null ? swarm.getGlobalBests() : swarm.getAgents().get(0).getPosition()));
+        return challengerParticle;
     }
 
     /**

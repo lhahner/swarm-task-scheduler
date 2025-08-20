@@ -5,7 +5,6 @@ import org.cloudsimplus.vms.Vm;
 import org.cloudsimplus.vms.VmSimple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pgm.swarm.Swarm;
 import pgm.swarm.pso.core.Particle;
 import pgm.swarm.pso.core.evaluations.Evaluation;
 import pgm.visualization.NoVisualizationStrategy;
@@ -13,7 +12,6 @@ import pgm.visualization.VisualizationStrategy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +23,7 @@ public class ParticleSwarmOptimizationTest {
     @BeforeEach
     void setUp() {
         ArrayList<CloudletSimple> tasks = new ArrayList<>();
-        ArrayList<Vm> vms = new ArrayList<>();
+        ArrayList<VmSimple> vms = new ArrayList<>();
         Evaluation evaluation = new Evaluation();
         VisualizationStrategy visualizationStrategy = new NoVisualizationStrategy();
         pso = new ParticleSwarmOptimization(visualizationStrategy, evaluation, tasks, vms);

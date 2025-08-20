@@ -1,6 +1,5 @@
 package pgm.swarm.pso.core.evaluations;
 
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.cloudsimplus.cloudlets.Cloudlet;
 import org.cloudsimplus.cloudlets.CloudletSimple;
@@ -9,7 +8,6 @@ import org.cloudsimplus.vms.VmSimple;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.DoubleStream;
 
 /**
  * Implements diverse types of evaluations functions to use.
@@ -56,7 +54,7 @@ public class Evaluation {
      * @param cloudVms The list of available VMs.
      * @return The calculated makespan value (lower is better). Returns a high default value if the assignment is invalid.
      */
-    public double evaluateMakespan(List<Double> currentPosition, ArrayList<CloudletSimple> cloudTasks, ArrayList<Vm> cloudVms){
+    public double evaluateMakespan(List<Double> currentPosition, List<CloudletSimple> cloudTasks, List<VmSimple> cloudVms){
         if (Math.abs((int) Math.round(currentPosition.stream().mapToDouble(Double::doubleValue).sum())) >= cloudVms.size()
         || Math.abs((int) Math.round(currentPosition.stream().mapToDouble(Double::doubleValue).sum())) >= cloudTasks.size()) {
             return 10.0;
@@ -93,7 +91,7 @@ public class Evaluation {
      * @param cloudVms The list of available VMs.
      * @return The calculated makespan value (lower is better). Returns a high default value if the assignment is invalid.
      */
-    public double taskExecutionTime(List<Double> currentPosition, ArrayList<CloudletSimple> cloudTasks, ArrayList<Vm> cloudVms){
+    public double taskExecutionTime(List<Double> currentPosition, ArrayList<CloudletSimple> cloudTasks, ArrayList<VmSimple> cloudVms){
         if (Math.abs((int) Math.round(currentPosition.stream().mapToDouble(Double::doubleValue).sum())) >= cloudVms.size()
                 || Math.abs((int) Math.round(currentPosition.stream().mapToDouble(Double::doubleValue).sum())) >= cloudTasks.size()) {
             return 10.0;
